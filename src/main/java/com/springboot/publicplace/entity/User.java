@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table
 @Builder
-public class User implements UserDetails{
+public class User extends BaseEntity implements UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
