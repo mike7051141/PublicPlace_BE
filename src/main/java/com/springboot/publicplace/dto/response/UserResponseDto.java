@@ -18,4 +18,8 @@ public class UserResponseDto {
     private String profileImg;
     private String gender;
     private String ageRange;
+    private String createdAt;
+    private String foot;
+    private String position;
+    private String loginApproach;
 }
