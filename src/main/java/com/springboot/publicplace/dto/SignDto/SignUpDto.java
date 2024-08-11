@@ -16,4 +16,6 @@ public class SignUpDto {
     private String profileImg;
     private String gender;
     private String ageRange;
+    private String foot;
+    private String position;
 }

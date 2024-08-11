@@ -80,6 +80,7 @@ public class KakaoServiceImpl implements KakaoService {
                         .phoneNumber(kakaoUserInfo.getPhoneNumber())
                         .profileImg(kakaoUserInfo.getProfileUrl())
                         .nickname(kakaoUserInfo.getNickname())
+                        .gender(kakaoUserInfo.getGender())
                         .ageRange(kakaoUserInfo.getAgeRange())
                         .loginApproach("Kakao-Login")
                         .password("1") // 카카오 로그인에서는 비밀번호가 필요하지 않음
@@ -116,12 +117,23 @@ public class KakaoServiceImpl implements KakaoService {
             Map<String, Object> kakaoAccount = (Map<String, Object>) responseMap.get("kakao_account");
             Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
 
+            // Gender 변환 로직 추가
+            String gender = (String) kakaoAccount.get("gender");
+            String displayGender;
+            if ("female".equals(gender)) {
+                displayGender = "여자";
+            } else if ("male".equals(gender)) {
+                displayGender = "남자";
+            } else {
+                displayGender = "기타"; // 기본값 설정
+            }
+
             KakaoResponseDto requestSignUpDto = KakaoResponseDto.builder()
                     .name((String) kakaoAccount.get("name"))
                     .phoneNumber((String) kakaoAccount.get("phone_number"))
                     .email((String) kakaoAccount.get("email"))
                     .profileUrl((String) profile.get("profile_image_url"))
-                    .gender((String) kakaoAccount.get("gender"))
+                    .gender(displayGender) // 카카오 로그인에선 male로 오기 때문에 남자로 변환함
                     .ageRange((String) kakaoAccount.get("age_range"))
                     .nickname((String) profile.get("nickname"))
                     .build();

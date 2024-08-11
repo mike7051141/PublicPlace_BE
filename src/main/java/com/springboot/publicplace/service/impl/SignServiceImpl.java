@@ -47,6 +47,8 @@ public class SignServiceImpl implements SignService {
                     .profileImg(signUpDto.getProfileImg())
                     .gender(signUpDto.getGender())
                     .ageRange(signUpDto.getAgeRange())
+                    .foot(signUpDto.getFoot())
+                    .position(signUpDto.getPosition())
                     .loginApproach("Local-Login")
                     .roles(Collections.singletonList("ROLE_ADMIN"))
                     .build();
