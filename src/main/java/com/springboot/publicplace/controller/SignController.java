@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/sign-api")
+@RequestMapping("/api/v1/sign-api")
 public class SignController {
 
     private Logger logger = LoggerFactory.getLogger(SignController.class);

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class User extends BaseEntity implements UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long uid;
+    private Long userId;
 
     private String name;
 
@@ -50,6 +50,10 @@ public class User extends BaseEntity implements UserDetails{
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<TeamUser> teamUsers; // 중간 엔티티 사용
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities(){
         return this.roles.stream()
