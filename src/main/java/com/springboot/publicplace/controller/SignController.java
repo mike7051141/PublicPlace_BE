@@ -12,12 +12,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/sign-api")
+@RequestMapping("/sign-api")
 public class SignController {
 
     private Logger logger = LoggerFactory.getLogger(SignController.class);
@@ -34,7 +36,6 @@ public class SignController {
         logger.info("[signUp] 회원가입을 수행합니다. email : {}, password : ****, name : {}, role : {}", signUpDto.getEmail(),
                 signUpDto.getPassword(),roles);
         SignUpResultDto signUpResultDto = signService.SignUp(signUpDto,roles);
-
         return signUpResultDto;
     }
 
