@@ -157,10 +157,6 @@ public class KakaoServiceImpl implements KakaoService {
                 // 기존 사용자의 정보 업데이트 (필요시)
                 user.setName(requestSignUpDto.getName());
                 user.setEmail(requestSignUpDto.getEmail());
-                user.setPhoneNumber(requestSignUpDto.getPhoneNumber());
-                user.setProfileImg(requestSignUpDto.getProfileUrl());
-                user.setNickname(requestSignUpDto.getNickname());
-                user.setGender(requestSignUpDto.getGender());
                 user.setAgeRange(requestSignUpDto.getAgeRange());
                 userRepository.save(user);
             }
