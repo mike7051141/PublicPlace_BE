@@ -3,6 +3,7 @@ package com.springboot.publicplace.controller;
 import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
 import com.springboot.publicplace.dto.response.TeamResponseDto;
+import com.springboot.publicplace.service.TeamJoinService;
 import com.springboot.publicplace.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class TeamController {
     private final TeamService teamService;
+    private final TeamJoinService teamJoinService;
 
     @PostMapping("/createTeam")
     public ResponseEntity<ResultDto> createTeam(@RequestBody TeamRequestDto requestDto, HttpServletRequest servletRequest) {
@@ -26,12 +28,6 @@ public class TeamController {
     @PutMapping("/updateTeam")
     public ResponseEntity<ResultDto> updateTeam(@RequestParam Long teamId, HttpServletRequest servletRequest,@RequestBody TeamRequestDto requestDto) {
         ResultDto resultDto = teamService.updateTeam(teamId, servletRequest, requestDto);
-        return ResponseEntity.status(HttpStatus.OK).body(resultDto);
-    }
-
-    @PostMapping("/joinTeam/{teamId}")
-    public ResponseEntity<ResultDto> joinTeam(@PathVariable Long teamId, HttpServletRequest servletRequest) {
-        ResultDto resultDto = teamService.joinTeam(teamId, servletRequest);
         return ResponseEntity.status(HttpStatus.OK).body(resultDto);
     }
 

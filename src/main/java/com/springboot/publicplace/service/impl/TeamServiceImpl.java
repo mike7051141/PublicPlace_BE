@@ -7,8 +7,10 @@ import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
 import com.springboot.publicplace.dto.response.TeamResponseDto;
 import com.springboot.publicplace.entity.Team;
+import com.springboot.publicplace.entity.TeamJoinRequest;
 import com.springboot.publicplace.entity.TeamUser;
 import com.springboot.publicplace.entity.User;
+import com.springboot.publicplace.repository.TeamJoinRequestRepository;
 import com.springboot.publicplace.repository.TeamRepository;
 import com.springboot.publicplace.repository.TeamUserRepository;
 import com.springboot.publicplace.repository.UserRepository;
@@ -76,12 +78,9 @@ public class TeamServiceImpl implements TeamService {
             Team team = teamRepository.findById(teamId)
                     .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
 
-            // 현재 유저가 해당 팀의 회장인지 확인
-            TeamUser teamUser = teamUserRepository.findByTeamAndUser(team, user)
-                    .orElseThrow(() -> new RuntimeException("해당 팀에 소속되지 않았거나 권한이 없습니다."));
-
-            if (!teamUser.getRole().equals("회장")) {
-                throw new RuntimeException("팀 정보를 수정할 권한이 없습니다.");
+            // 회장 여부 확인
+            if (!isTeamLeader(team, user)) {
+                throw new RuntimeException("회장만 이 작업을 수행할 수 있습니다.");
             }
 
             // 팀 정보 업데이트
@@ -96,34 +95,6 @@ public class TeamServiceImpl implements TeamService {
         } else {
             setFail(resultDto);
         }
-        return resultDto;
-    }
-
-
-    @Override
-    public ResultDto joinTeam(Long teamId, HttpServletRequest servletRequest) {
-        String token = jwtTokenProvider.resolveToken(servletRequest);
-        String email = jwtTokenProvider.getUsername(token);
-        User user = userRepository.findByEmail(email);
-
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
-
-        boolean alreadyJoined = teamUserRepository.existsByTeamAndUser(team, user);
-        if (alreadyJoined) {
-            throw new RuntimeException("이미 팀에 가입된 유저입니다.");
-        }
-        // 팀 가입 로직
-        TeamUser teamUser = new TeamUser();
-        teamUser.setTeam(team);
-        teamUser.setUser(user);
-        teamUser.setRole("팀원");  // 기본 역할을 '팀원'으로 설정
-
-        teamUserRepository.save(teamUser);
-
-        // 성공 결과 반환
-        ResultDto resultDto = new ResultDto();
-        setSuccess(resultDto);
         return resultDto;
     }
 
@@ -171,5 +142,9 @@ public class TeamServiceImpl implements TeamService {
         resultDto.setCode(CommonResponse.Fail.getCode());
 
         resultDto.setMsg(CommonResponse.Fail.getMsg());
+    }
+    public boolean isTeamLeader(Team team, User user) {
+        TeamUser teamUser = teamUserRepository.findByTeamAndUser(team,user);
+        return teamUser != null && "회장".equals(teamUser.getRole());
     }
 }
