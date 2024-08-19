@@ -26,4 +26,5 @@ public class TeamUser {
     private User user;
 
     private String role;
+
 }
