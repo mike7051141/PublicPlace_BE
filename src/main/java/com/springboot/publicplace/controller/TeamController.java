@@ -20,13 +20,16 @@ public class TeamController {
     private final TeamJoinService teamJoinService;
 
     @PostMapping("/createTeam")
-    public ResponseEntity<ResultDto> createTeam(@RequestBody TeamRequestDto requestDto, HttpServletRequest servletRequest) {
+    public ResponseEntity<ResultDto> createTeam(@RequestBody TeamRequestDto requestDto,
+                                                HttpServletRequest servletRequest) {
         ResultDto resultDto = teamService.createTeam(servletRequest, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(resultDto);
     }
 
     @PutMapping("/updateTeam")
-    public ResponseEntity<ResultDto> updateTeam(@RequestParam Long teamId, HttpServletRequest servletRequest,@RequestBody TeamRequestDto requestDto) {
+    public ResponseEntity<ResultDto> updateTeam(@RequestParam Long teamId,
+                                                HttpServletRequest servletRequest,
+                                                @RequestBody TeamRequestDto requestDto) {
         ResultDto resultDto = teamService.updateTeam(teamId, servletRequest, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(resultDto);
     }

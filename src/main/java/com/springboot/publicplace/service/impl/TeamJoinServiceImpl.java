@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,6 +71,27 @@ public class TeamJoinServiceImpl implements TeamJoinService {
         teamJoinRequestRepository.save(joinRequest);
 
         // 성공 결과 반환
+        ResultDto resultDto = new ResultDto();
+        setSuccess(resultDto);
+        return resultDto;
+    }
+
+    @Override
+    public ResultDto leaveTeam(Long teamId, HttpServletRequest servletRequest){
+        String token = jwtTokenProvider.resolveToken(servletRequest);
+        String email = jwtTokenProvider.getUsername(token);
+        User user = userRepository.findByEmail(email);
+
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+
+        TeamUser teamUser = teamUserRepository.findByTeamAndUser(team, user);
+        if (teamUser == null) {
+            throw new RuntimeException("팀에 가입되지 않은 상태입니다.");
+        }
+
+        teamUserRepository.delete(teamUser);
+
         ResultDto resultDto = new ResultDto();
         setSuccess(resultDto);
         return resultDto;
@@ -147,11 +167,6 @@ public class TeamJoinServiceImpl implements TeamJoinService {
             throw new RuntimeException("회장만 이 작업을 수행할 수 있습니다.");
         }
 
-        request.setStatus("APPROVED");
-        request.setProcessDate(LocalDateTime.now());
-
-        teamJoinRequestRepository.save(request);
-
         // 팀원으로 추가
         TeamUser teamUser = new TeamUser();
         teamUser.setTeam(request.getTeam());
@@ -160,6 +175,9 @@ public class TeamJoinServiceImpl implements TeamJoinService {
 
         // 팀원 저장
         teamUserRepository.save(teamUser);
+
+        // 가입 요청 삭제
+        teamJoinRequestRepository.delete(request);
 
         ResultDto resultDto = new ResultDto();
         setSuccess(resultDto);
@@ -181,10 +199,8 @@ public class TeamJoinServiceImpl implements TeamJoinService {
             throw new RuntimeException("회장만 이 작업을 수행할 수 있습니다.");
         }
 
-        request.setStatus("REJECTED");
-        request.setProcessDate(LocalDateTime.now());
-
-        teamJoinRequestRepository.save(request);
+        // 가입 요청 삭제
+        teamJoinRequestRepository.delete(request);
 
         ResultDto resultDto = new ResultDto();
         setSuccess(resultDto);
