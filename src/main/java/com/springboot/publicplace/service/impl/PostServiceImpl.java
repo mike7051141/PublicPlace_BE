@@ -2,11 +2,15 @@ package com.springboot.publicplace.service.impl;
 
 import com.springboot.publicplace.config.security.JwtTokenProvider;
 import com.springboot.publicplace.dto.ResultDto;
+import com.springboot.publicplace.dto.request.CommentRequestDto;
 import com.springboot.publicplace.dto.request.PostRequestDto;
-import com.springboot.publicplace.dto.request.TeamRequestDto;
+import com.springboot.publicplace.dto.response.CommentResponseDto;
+import com.springboot.publicplace.dto.response.PostCommentResponseDto;
+import com.springboot.publicplace.dto.response.PostDetailResponseDto;
+import com.springboot.publicplace.entity.Comment;
 import com.springboot.publicplace.entity.Post;
-import com.springboot.publicplace.entity.Team;
 import com.springboot.publicplace.entity.User;
+import com.springboot.publicplace.repository.CommentRepository;
 import com.springboot.publicplace.repository.PostRepository;
 import com.springboot.publicplace.repository.UserRepository;
 import com.springboot.publicplace.service.PostService;
@@ -14,12 +18,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
@@ -118,4 +125,113 @@ public class PostServiceImpl implements PostService {
         }
         return resultDto;
     }
+
+    @Override
+    public PostDetailResponseDto getPostDetails(Long postId, HttpServletRequest servletRequest) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
+
+        post.setViewCount(post.getViewCount() + 1);
+        postRepository.save(post);
+
+        PostDetailResponseDto postDetailResponseDto = new PostDetailResponseDto();
+        postDetailResponseDto.setTitle(post.getTitle());
+        postDetailResponseDto.setCategory(post.getCategory());
+        postDetailResponseDto.setContent(post.getContent());
+        postDetailResponseDto.setPostImg(post.getPostImg());
+        postDetailResponseDto.setAuthorNickname(post.getUser().getNickname());
+        postDetailResponseDto.setCreatedDate(post.getCreatedAt());
+        postDetailResponseDto.setViewCount(post.getViewCount());
+        postDetailResponseDto.setLikeCount(post.getLiked());
+        postDetailResponseDto.setCommentCount(post.getComments().size());
+
+        List<PostCommentResponseDto> postCommentResponseDtos = post.getComments().stream()
+                .map(comment -> {
+                    PostCommentResponseDto postCommentResponseDto = new PostCommentResponseDto();
+                    postCommentResponseDto.setCommentId(comment.getCommentId());
+                    postCommentResponseDto.setProfileImg(comment.getUser().getProfileImg());
+                    postCommentResponseDto.setContent(comment.getContent());
+                    postCommentResponseDto.setNickname(comment.getUser().getNickname());
+                    postCommentResponseDto.setCreatedDate(comment.getCreatedAt());
+                    return postCommentResponseDto;
+                })
+                .collect(Collectors.toList());
+        postDetailResponseDto.setComments(postCommentResponseDtos);
+
+        return postDetailResponseDto;
+    }
+
+    @Override
+    public ResultDto createComment(HttpServletRequest servletRequest, CommentRequestDto commentRequestDto) {
+        ResultDto resultDto = new ResultDto();
+        try {
+            String token = jwtTokenProvider.resolveToken(servletRequest);
+            String email = jwtTokenProvider.getUsername(token);
+            User user = userRepository.findByEmail(email);
+
+            Post post = postRepository.findById(commentRequestDto.getPostId())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
+
+            Comment comment = new Comment();
+            comment.setContent(commentRequestDto.getContent());
+            comment.setUser(user);
+            comment.setPost(post);
+
+            commentRepository.save(comment);
+
+            resultDto.setSuccess(true);
+            resultDto.setMsg("댓글이 성공적으로 작성되었습니다");
+        } catch (Exception e) {
+            resultDto.setSuccess(false);
+            resultDto.setMsg("댓글 작성에 실패했습니다: " + e.getMessage());
+        }
+        return resultDto;
+    }
+
+    @Override
+    public ResultDto deleteComment(Long commentId, HttpServletRequest servletRequest) {
+        ResultDto resultDto = new ResultDto();
+
+        try {
+            String token = jwtTokenProvider.resolveToken(servletRequest);
+            String email = jwtTokenProvider.getUsername(token);
+            User user = userRepository.findByEmail(email);
+
+            Comment comment = commentRepository.findById(commentId)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 댓글을 찾을 수 없습니다."));
+
+            // 댓글 작성자 & 게시글 작성자만 댓글 삭제 가능
+            if (comment.getUser().equals(user) || comment.getPost().getUser().equals(user)) {
+                commentRepository.delete(comment);
+                resultDto.setSuccess(true);
+                resultDto.setMsg("댓글이 삭제되었습니다.");
+            } else {
+                // 권한이 없을 때
+                resultDto.setSuccess(false);
+                resultDto.setMsg("댓글을 삭제할 권한이 없습니다.");
+            }
+        } catch (Exception e) {
+            resultDto.setSuccess(false);
+            resultDto.setMsg("댓글을 삭제하는 도중 에러가 발생함: " + e.getMessage());
+        }
+        return resultDto;
+    }
+
+//    @Override
+//    public List<CommentResponseDto> getCommentsByPost(Long postId) {
+//        List<Comment> comments = commentRepository.findByPost_PostId(postId);
+//
+//        List<CommentResponseDto> commentResponseDtoList = comments.stream()
+//                .map(comment -> {
+//                    CommentResponseDto commentResponseDto = new CommentResponseDto();
+//                    commentResponseDto.setProfileImg(comment.getUser().getProfileImg());
+//                    commentResponseDto.setNickname(comment.getUser().getNickname());
+//                    commentResponseDto.setContent(comment.getContent());
+//                    commentResponseDto.setCreatedDate(comment.getCreatedAt());
+//                    return commentResponseDto;
+//                })
+//                .collect(Collectors.toList());
+//
+//        return commentResponseDtoList;
+//    }
 }

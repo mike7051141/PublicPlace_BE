@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface TeamService{
     ResultDto createTeam(HttpServletRequest request, TeamRequestDto teamRequestDto);
+
     ResultDto updateTeam(Long teamId, HttpServletRequest request, TeamRequestDto teamRequestDto);
+
     TeamResponseDto getTeamInfo(Long teamId);
 }

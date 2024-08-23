@@ -27,7 +27,7 @@ public class Post extends BaseEntity {
     private String title;
     private String content;
     private int liked;
-    private int viewed;
+    private int viewCount;
     private String category;
     private String postImg;
 
