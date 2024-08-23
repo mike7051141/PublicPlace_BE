@@ -26,7 +26,6 @@ public class JwtTokenProvider {
     private final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
     private final UserDetailsService userDetailsService;
 
-
     //@Autowired
     //public JwtTokenProvider(UserDetailsService userDetailsService) {
     //     this.userDetailsService = userDetailsService;
