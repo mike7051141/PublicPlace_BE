@@ -65,6 +65,12 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(resultDto);
     }
 
+    @PostMapping("/like/{postId}")
+    public ResponseEntity<ResultDto> toggleLike(@PathVariable Long postId, HttpServletRequest servletRequest) {
+        ResultDto resultDto = postService.toggleLike(postId, servletRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(resultDto);
+    }
+
 //    @GetMapping("/getComments/{postId}")
 //    public ResponseEntity<List<CommentResponseDto>> getCommentsByPost(@PathVariable Long postId) {
 //        List<CommentResponseDto> commentResponseDtoList = postService.getCommentsByPost(postId);
