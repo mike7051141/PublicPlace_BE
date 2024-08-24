@@ -7,6 +7,7 @@ import com.springboot.publicplace.dto.request.PostRequestDto;
 import com.springboot.publicplace.dto.response.CommentResponseDto;
 import com.springboot.publicplace.dto.response.PostCommentResponseDto;
 import com.springboot.publicplace.dto.response.PostDetailResponseDto;
+import com.springboot.publicplace.dto.response.PostListResponseDto;
 import com.springboot.publicplace.entity.Comment;
 import com.springboot.publicplace.entity.LikePost;
 import com.springboot.publicplace.entity.Post;
@@ -17,6 +18,10 @@ import com.springboot.publicplace.repository.PostRepository;
 import com.springboot.publicplace.repository.UserRepository;
 import com.springboot.publicplace.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -127,6 +132,38 @@ public class PostServiceImpl implements PostService {
             }
         }
         return resultDto;
+    }
+
+    public List<PostListResponseDto> getPostsByCategory(String category, int page, String sortBy) {
+
+        Sort sort;
+        if(sortBy.equals("views")){
+            sort = Sort.by(Sort.Direction.DESC, "viewCount").and(Sort.by(Sort.Direction.DESC, "createdAt"));
+        } else if (sortBy.equals("likes")) {
+            sort = Sort.by(Sort.Direction.DESC,"liked").and(Sort.by(Sort.Direction.DESC, "createdAt"));
+        } else {
+            sort = Sort.by(Sort.Direction.DESC,"createdAt");
+        }
+        Pageable pageable = PageRequest.of(page,10, sort);
+        Page<Post> posts;
+
+        if ("전체".equals(category)) {
+            posts = postRepository.findAll(pageable);
+        } else {
+            posts = postRepository.findByCategory(category, pageable);
+        }
+        Page<PostListResponseDto> postPage =posts.map(post -> PostListResponseDto.builder()
+                .postId(post.getPostId())
+                .category(post.getCategory())
+                .title(post.getTitle())
+                .authorNickname(post.getUser().getNickname())
+                .viewCount(post.getViewCount())
+                .commentCount(post.getComments().size())
+                .likeCount(post.getLiked())
+                .createdDate(post.getCreatedAt())
+                .build());
+        List<PostListResponseDto> postList = postPage.getContent();
+        return postList;
     }
 
     @Override
