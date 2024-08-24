@@ -8,9 +8,11 @@ import com.springboot.publicplace.dto.response.CommentResponseDto;
 import com.springboot.publicplace.dto.response.PostCommentResponseDto;
 import com.springboot.publicplace.dto.response.PostDetailResponseDto;
 import com.springboot.publicplace.entity.Comment;
+import com.springboot.publicplace.entity.LikePost;
 import com.springboot.publicplace.entity.Post;
 import com.springboot.publicplace.entity.User;
 import com.springboot.publicplace.repository.CommentRepository;
+import com.springboot.publicplace.repository.LikePostRepository;
 import com.springboot.publicplace.repository.PostRepository;
 import com.springboot.publicplace.repository.UserRepository;
 import com.springboot.publicplace.service.PostService;
@@ -27,6 +29,7 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final LikePostRepository likePostRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
@@ -213,6 +216,40 @@ public class PostServiceImpl implements PostService {
         } catch (Exception e) {
             resultDto.setSuccess(false);
             resultDto.setMsg("댓글을 삭제하는 도중 에러가 발생함: " + e.getMessage());
+        }
+        return resultDto;
+    }
+
+    @Override
+    public ResultDto toggleLike(Long postId, HttpServletRequest servletRequest) {
+        String token = jwtTokenProvider.resolveToken(servletRequest);
+        String email = jwtTokenProvider.getUsername(token);
+        User user = userRepository.findByEmail(email);
+
+        ResultDto resultDto = new ResultDto();
+
+        if (jwtTokenProvider.validationToken(token)) {
+            Post post = postRepository.findById(postId)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
+            LikePost existingLike = likePostRepository.findByUserAndPost(user, post);
+
+            if (existingLike != null) {
+                likePostRepository.delete(existingLike);
+                post.setLiked(post.getLiked() - 1);
+                resultDto.setMsg("좋아요가 취소되었습니다");
+            } else {
+                LikePost likePost = new LikePost();
+                likePost.setUser(user);
+                likePost.setPost(post);
+                likePostRepository.save(likePost);
+                post.setLiked(post.getLiked() + 1);
+                resultDto.setMsg("좋아요가 추가되었습니다.");
+            }
+            postRepository.save(post);
+            resultDto.setSuccess(true);
+        } else {
+            resultDto.setSuccess(false);
+            resultDto.setMsg("로그인을 먼저 해주세요");
         }
         return resultDto;
     }

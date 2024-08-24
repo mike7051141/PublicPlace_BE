@@ -21,5 +21,7 @@ public interface PostService {
 
     ResultDto deleteComment(Long commentId, HttpServletRequest servletRequest);
 
+    ResultDto toggleLike(Long postId, HttpServletRequest servletRequest);
+
 //    List<CommentResponseDto> getCommentsByPost(Long postId);
 }
