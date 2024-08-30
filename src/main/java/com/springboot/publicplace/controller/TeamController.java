@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class TeamController {
     private final TeamService teamService;
-    private final TeamJoinService teamJoinService;
 
     @PostMapping("/createTeam")
     public ResponseEntity<ResultDto> createTeam(@RequestBody TeamRequestDto requestDto,
