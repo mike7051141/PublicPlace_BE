@@ -5,17 +5,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TeamBoardDetailResponseDto {
+public class TeamBoardListResponseDto {
     private Long teamBoardId;
     private String content;
     private String Image;
     private String userName;
     private String matchLocation;
     private LocalDateTime createdDate;
-    private List<TeamBoardCommentResponseDto> comments;
 }
