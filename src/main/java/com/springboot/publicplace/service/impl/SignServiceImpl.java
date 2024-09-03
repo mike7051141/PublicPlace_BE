@@ -2,6 +2,7 @@ package com.springboot.publicplace.service.impl;
 
 import com.springboot.publicplace.config.security.JwtTokenProvider;
 import com.springboot.publicplace.dto.CommonResponse;
+import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.SignDto.SignInResultDto;
 import com.springboot.publicplace.dto.SignDto.SignUpDto;
 import com.springboot.publicplace.dto.SignDto.SignUpResultDto;
@@ -100,6 +101,45 @@ public class SignServiceImpl implements SignService {
         logger.info("[getSignInResult] SignInResultDto 객체에 값 주입");
         setSuccess(signInResultDto);
         return signInResultDto;
+    }
+
+    @Override
+    public ResultDto checkEmail(String email) {
+        ResultDto resultDto = new ResultDto();
+        if (userRepository.existsByEmail(email)) {
+            resultDto.setSuccess(false);
+            resultDto.setMsg("이미 존재하는 이메일입니다");
+        }else {
+            resultDto.setSuccess(true);
+            resultDto.setMsg("사용 가능한 이메일입니다.");
+        }
+        return resultDto;
+    }
+
+    @Override
+    public ResultDto checkPhoneNum (String phoneNum) {
+        ResultDto resultDto = new ResultDto();
+        if (userRepository.existsByPhoneNumber(phoneNum)) {
+            resultDto.setSuccess(false);
+            resultDto.setMsg("이미 존재하는 전화번호입니다");
+        }else {
+            resultDto.setSuccess(true);
+            resultDto.setMsg("사용 가능한 전화번호입니다.");
+        }
+        return resultDto;
+    }
+
+    @Override
+    public ResultDto checkNickname(String nickname) {
+        ResultDto resultDto = new ResultDto();
+        if (userRepository.existsByNickname(nickname)) {
+            resultDto.setSuccess(false);
+            resultDto.setMsg("이미 존재하는 닉네임입니다");
+        }else {
+            resultDto.setSuccess(true);
+            resultDto.setMsg("사용 가능한 닉네임입니다.");
+        }
+        return resultDto;
     }
 
     private void setSuccess(SignUpResultDto result){
