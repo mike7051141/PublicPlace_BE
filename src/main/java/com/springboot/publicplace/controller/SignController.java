@@ -1,6 +1,7 @@
 package com.springboot.publicplace.controller;
 
 
+import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.SignDto.SignInResultDto;
 import com.springboot.publicplace.dto.SignDto.SignUpDto;
 import com.springboot.publicplace.dto.SignDto.SignUpResultDto;
@@ -24,16 +25,16 @@ public class SignController {
     private SignService signService;
 
     @Autowired
-    public SignController(SignService signService){
+    public SignController(SignService signService) {
 
         this.signService = signService;
     }
 
     @PostMapping("/sign-up")
-    public SignUpResultDto SignUp(@RequestBody SignUpDto signUpDto, String roles){
+    public SignUpResultDto SignUp(@RequestBody SignUpDto signUpDto, String roles) {
         logger.info("[signUp] 회원가입을 수행합니다. email : {}, password : ****, name : {}, role : {}", signUpDto.getEmail(),
-                signUpDto.getPassword(),roles);
-        SignUpResultDto signUpResultDto = signService.SignUp(signUpDto,roles);
+                signUpDto.getPassword(), roles);
+        SignUpResultDto signUpResultDto = signService.SignUp(signUpDto, roles);
         return signUpResultDto;
     }
 
@@ -41,14 +42,15 @@ public class SignController {
     public SignInResultDto SignIn(@RequestParam String email, String password) {
         logger.info("[sign-in] 로그인을 시도하고 있습니다. id : {}, password : *****", email);
         SignInResultDto signInResultDto = signService.SignIn(email, password);
-        if(signInResultDto.getCode() == 0){
-            logger.info("[sign-in] 정상적으로 로그인이 되었습니다. id: {}, token : {}",email,signInResultDto.getToken());
+        if (signInResultDto.getCode() == 0) {
+            logger.info("[sign-in] 정상적으로 로그인이 되었습니다. id: {}, token : {}", email, signInResultDto.getToken());
             signInResultDto.getToken();
         }
         return signInResultDto;
     }
+
     @GetMapping(value = "/exception")
-    public void exceptionTest()throws  RuntimeException{
+    public void exceptionTest() throws RuntimeException {
         throw new RuntimeException("접근이 금지 되었습니다.");
     }
 
@@ -67,4 +69,5 @@ public class SignController {
 
         return new ResponseEntity<>(map, responseHeaders, httpStatus);
     }
+
 }
