@@ -24,15 +24,9 @@ public class KakaoController {
     private String redirect_url;
 
     @GetMapping("/page")
-    public String loginPage(Model model) {
+    public ResponseEntity<String> loginPage() {
         String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+client_id+"&redirect_uri="+redirect_url;
-<<<<<<< Updated upstream
-        model.addAttribute("location", location);
-
-        return "login";
-=======
         return ResponseEntity.status(HttpStatus.OK).body(location);
->>>>>>> Stashed changes
     }
 
     @GetMapping("/callback")
