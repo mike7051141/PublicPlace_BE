@@ -1,5 +1,6 @@
 package com.springboot.publicplace.controller;
 
+import com.springboot.publicplace.dto.SignDto.SignInResultDto;
 import com.springboot.publicplace.service.KakaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import springfox.documentation.annotations.ApiIgnore;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/api/v1/kakao")
@@ -30,9 +34,17 @@ public class KakaoController {
         return ResponseEntity.status(HttpStatus.OK).body(location);
     }
 
+    @ApiIgnore
     @GetMapping("/callback")
     @ResponseBody
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
-        return kakaoService.getKaKaoUserInfo(code);
+        return ResponseEntity.status(HttpStatus.OK).body(code);
+    }
+
+    @GetMapping("/login")
+    @ResponseBody
+    public ResponseEntity<?> kakaoLogin(@RequestParam String code, HttpServletRequest servletRequest) {
+        ResponseEntity<?> signInResultDto = kakaoService.getKaKaoUserInfo(code);
+        return ResponseEntity.status(HttpStatus.OK).body(signInResultDto);
     }
 }
