@@ -1,6 +1,5 @@
 package com.springboot.publicplace.controller;
 
-import com.springboot.publicplace.dto.SignDto.SignInResultDto;
 import com.springboot.publicplace.service.KakaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
