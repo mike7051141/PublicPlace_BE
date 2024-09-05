@@ -28,8 +28,6 @@ public class SecurityConfiguration {
     @Bean
     protected SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .cors() // CORS 허용
-                .and()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
