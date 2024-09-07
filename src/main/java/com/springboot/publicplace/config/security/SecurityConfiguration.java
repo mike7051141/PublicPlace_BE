@@ -27,7 +27,10 @@ public class SecurityConfiguration {
     }
     @Bean
     protected SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.httpBasic().disable() // REST API는 UI를 사용하지 않으므로 기본설정을 비활성화
+        httpSecurity
+                .cors()
+                .and()
+                .httpBasic().disable() // REST API는 UI를 사용하지 않으므로 기본설정을 비활성화
 
                 .csrf().disable() // REST API는 csrf 보안이 필요 없으므로 비활성화
 
@@ -37,6 +40,7 @@ public class SecurityConfiguration {
 
                 .and()
                 .authorizeRequests() // 리퀘스트에 대한 사용권한 체크
+                .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()// 
                 .antMatchers("/sign-api/sign-in", "/sign-api/sign-up",("/kakao/callback"),
                         "/sign-api/exception", "/api/files/**").permitAll() // 가입 및 로그인 주소는 허용
                 .antMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
