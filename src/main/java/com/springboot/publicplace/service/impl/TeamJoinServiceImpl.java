@@ -33,46 +33,52 @@ public class TeamJoinServiceImpl implements TeamJoinService {
 
     @Override
     public ResultDto joinTeam(Long teamId, HttpServletRequest servletRequest, String joinReason) {
-        String token = jwtTokenProvider.resolveToken(servletRequest);
-        String email = jwtTokenProvider.getUsername(token);
-        User user = userRepository.findByEmail(email);
-
-        // 팀 조회
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
-
-        // 이미 팀에 가입된 상태인지 확인
-        boolean alreadyJoined = teamUserRepository.existsByTeamAndUser(team, user);
-        if (alreadyJoined) {
-            throw new RuntimeException("이미 팀에 가입된 유저입니다.");
-        }
-
-        // 이미 가입 신청서를 제출했는지 확인
-        boolean alreadyRequested = teamJoinRequestRepository.existsByTeamAndUserAndStatus(team, user, "PENDING");
-        if (alreadyRequested) {
-            throw new RuntimeException("이미 팀에 가입 신청을 한 상태입니다.");
-        }
-
-        // 팀 가입 신청서 생성
-        TeamJoinRequest joinRequest = new TeamJoinRequest();
-        joinRequest.setTeam(team);
-        joinRequest.setUser(user);
-        joinRequest.setRole("팀원");
-        joinRequest.setStatus("PENDING");
-        joinRequest.setRequestDate(LocalDateTime.now());
-
-        // 새로 추가된 필드에 값 설정
-        joinRequest.setUserName(user.getName());
-        joinRequest.setUserGender(user.getGender());
-        joinRequest.setUserAgeRange(user.getAgeRange());
-        joinRequest.setUserPhoneNumber(user.getPhoneNumber());
-        joinRequest.setJoinReason(joinReason);
-
-        teamJoinRequestRepository.save(joinRequest);
-
-        // 성공 결과 반환
         ResultDto resultDto = new ResultDto();
-        setSuccess(resultDto);
+        try {
+            String token = jwtTokenProvider.resolveToken(servletRequest);
+            String email = jwtTokenProvider.getUsername(token);
+            User user = userRepository.findByEmail(email);
+
+
+            // 팀 조회
+            Team team = teamRepository.findById(teamId)
+                    .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+
+            // 이미 팀에 가입된 상태인지 확인
+            boolean alreadyJoined = teamUserRepository.existsByTeamAndUser(team, user);
+            if (alreadyJoined) {
+                throw new RuntimeException("이미 팀에 가입된 유저입니다.");
+            }
+
+            // 이미 가입 신청서를 제출했는지 확인
+            boolean alreadyRequested = teamJoinRequestRepository.existsByTeamAndUserAndStatus(team, user, "PENDING");
+            if (alreadyRequested) {
+                throw new RuntimeException("이미 팀에 가입 신청을 한 상태입니다.");
+            }
+
+            // 팀 가입 신청서 생성
+            TeamJoinRequest joinRequest = new TeamJoinRequest();
+            joinRequest.setTeam(team);
+            joinRequest.setUser(user);
+            joinRequest.setRole("팀원");
+            joinRequest.setStatus("PENDING");
+            joinRequest.setRequestDate(LocalDateTime.now());
+
+            // 새로 추가된 필드에 값 설정
+            joinRequest.setUserName(user.getName());
+            joinRequest.setUserGender(user.getGender());
+            joinRequest.setUserAgeRange(user.getAgeRange());
+            joinRequest.setUserPhoneNumber(user.getPhoneNumber());
+            joinRequest.setJoinReason(joinReason);
+
+            teamJoinRequestRepository.save(joinRequest);
+
+            resultDto.setSuccess(true);
+            resultDto.setMsg("팀 가입 신청을 완료하였습니다.");
+        } catch (Exception e) {
+            resultDto.setSuccess(false);
+            resultDto.setMsg("팀가입 신청을 실패하였습니다: " + e.getMessage());
+        }
         return resultDto;
     }
 
