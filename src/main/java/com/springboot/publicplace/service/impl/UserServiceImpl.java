@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email);
 
         ResultDto resultDto = new ResultDto();
-        if (jwtTokenProvider.validationToken(token) && user.getLoginApproach().equals("Local-Login")) {
+        if (jwtTokenProvider.validationToken(token) && user.getLoginApproach().equals("Kakao-Login")) {
             User localUser = userRepository.findByEmail(email);
             localUser.setNickname(localUserUpdateDto.getNickname());
             localUser.setGender(localUserUpdateDto.getGender());
