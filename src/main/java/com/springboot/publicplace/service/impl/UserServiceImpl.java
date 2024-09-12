@@ -3,8 +3,8 @@ package com.springboot.publicplace.service.impl;
 import com.springboot.publicplace.config.security.JwtTokenProvider;
 import com.springboot.publicplace.dto.CommonResponse;
 import com.springboot.publicplace.dto.ResultDto;
-import com.springboot.publicplace.dto.SignDto.SignUpResultDto;
-import com.springboot.publicplace.dto.request.UserUpdateDto;
+import com.springboot.publicplace.dto.request.KakaoUserUpdateDto;
+import com.springboot.publicplace.dto.request.LocalUserUpdateDto;
 import com.springboot.publicplace.dto.response.MyPageTeamResponseDto;
 import com.springboot.publicplace.dto.response.UserResponseDto;
 import com.springboot.publicplace.entity.TeamJoinRequest;
@@ -15,6 +15,7 @@ import com.springboot.publicplace.repository.TeamUserRepository;
 import com.springboot.publicplace.repository.UserRepository;
 import com.springboot.publicplace.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final TeamUserRepository teamUserRepository;
     private final TeamJoinRequestRepository teamJoinRequestRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponseDto getUser(HttpServletRequest servletRequest) {
@@ -56,23 +58,49 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResultDto updateUser(HttpServletRequest servletRequest, UserUpdateDto userUpdateDto) {
+    public ResultDto updateKakaoUser(HttpServletRequest servletRequest, KakaoUserUpdateDto kakaoUserUpdateDto) {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
+        User user = userRepository.findByEmail(email);
 
         ResultDto resultDto = new ResultDto();
-        if (jwtTokenProvider.validationToken(token)) {
-            User user = userRepository.findByEmail(email);
-            user.setNickname(userUpdateDto.getNickname());
-            user.setGender(userUpdateDto.getGender());
-            user.setPhoneNumber(userUpdateDto.getPhoneNumber());
-            user.setFoot(userUpdateDto.getFoot());
-            user.setProfileImg(userUpdateDto.getProfileImg());
-            user.setPosition(userUpdateDto.getPosition());
-            user.setUpdatedAt(LocalDateTime.now());
+        if (jwtTokenProvider.validationToken(token) && user.getLoginApproach().equals("Kakao-Login")) {
+            User kakaoUser = userRepository.findByEmail(email);
+            kakaoUser.setNickname(kakaoUserUpdateDto.getNickname());
+            kakaoUser.setGender(kakaoUserUpdateDto.getGender());
+            kakaoUser.setPhoneNumber(kakaoUserUpdateDto.getPhoneNumber());
+            kakaoUser.setFoot(kakaoUserUpdateDto.getFoot());
+            kakaoUser.setProfileImg(kakaoUserUpdateDto.getProfileImg());
+            kakaoUser.setPosition(kakaoUserUpdateDto.getPosition());
+            kakaoUser.setUpdatedAt(LocalDateTime.now());
             userRepository.save(user);
             setSuccess(resultDto);
         }else {
+            setFail(resultDto);
+        }
+        return resultDto;
+    }
+
+    @Override
+    public ResultDto updateLocalUser (HttpServletRequest servletRequest, LocalUserUpdateDto localUserUpdateDto) {
+        String token = jwtTokenProvider.resolveToken(servletRequest);
+        String email = jwtTokenProvider.getUsername(token);
+        User user = userRepository.findByEmail(email);
+
+        ResultDto resultDto = new ResultDto();
+        if (jwtTokenProvider.validationToken(token) && user.getLoginApproach().equals("Kakao-Login")) {
+            User localUser = userRepository.findByEmail(email);
+            localUser.setNickname(localUserUpdateDto.getNickname());
+            localUser.setGender(localUserUpdateDto.getGender());
+            localUser.setPassword(passwordEncoder.encode(localUserUpdateDto.getPassword()));
+            localUser.setPhoneNumber(localUserUpdateDto.getPhoneNumber());
+            localUser.setFoot(localUserUpdateDto.getFoot());
+            localUser.setProfileImg(localUserUpdateDto.getProfileImg());
+            localUser.setPosition(localUserUpdateDto.getPosition());
+            localUser.setUpdatedAt(LocalDateTime.now());
+            userRepository.save(user);
+            setSuccess(resultDto);
+        } else {
             setFail(resultDto);
         }
         return resultDto;

@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         logger.info("[doFilterInternal] token 값 유효성 체크 시작");
         if(token!=null&& jwtTokenProvider.validationToken(token)){
-            //인증 완료된 token SecurityContextHolder에 Authentication으로 저징하기
+            //인증 완료된 token SecurityContextHolder에 Authentication으로 저장하기
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             logger.info("[doFilterInternal] token 값 유효성 체크 완료");

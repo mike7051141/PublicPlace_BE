@@ -7,20 +7,16 @@ import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
 import com.springboot.publicplace.dto.response.TeamResponseDto;
 import com.springboot.publicplace.entity.Team;
-import com.springboot.publicplace.entity.TeamJoinRequest;
 import com.springboot.publicplace.entity.TeamUser;
 import com.springboot.publicplace.entity.User;
-import com.springboot.publicplace.repository.TeamJoinRequestRepository;
 import com.springboot.publicplace.repository.TeamRepository;
 import com.springboot.publicplace.repository.TeamUserRepository;
 import com.springboot.publicplace.repository.UserRepository;
 import com.springboot.publicplace.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -118,6 +114,7 @@ public class TeamServiceImpl implements TeamService {
         Long teamMemberCount = (long) members.size();
 
         return new TeamResponseDto(
+                team.getTeamId(),
                 team.getTeamName(),
                 team.getTeamInfo(),
                 team.getCreatedAt(),
@@ -127,6 +124,41 @@ public class TeamServiceImpl implements TeamService {
                 teamMemberCount,
                 members
         );
+    }
+
+    @Override
+    public List<TeamResponseDto> getTeamList(HttpServletRequest servletRequest) {
+        List<Team> teams = teamRepository.findAll();
+        return teams.stream()
+                .map(team -> {
+                    // 팀원 리스트 생성
+                    List<MemberDto> members = team.getTeamUsers().stream()
+                            .map(teamUser -> new MemberDto(
+                                    teamUser.getUser().getName(),
+                                    teamUser.getUser().getNickname(),
+                                    teamUser.getUser().getPosition(),
+                                    teamUser.getRole(),
+                                    teamUser.getUser().getAgeRange()
+                            ))
+                            .collect(Collectors.toList());
+
+                    // 팀원 수 계산
+                    Long teamMemberCount = (long) members.size();
+
+                    // TeamResponseDto 생성 및 반환
+                    return TeamResponseDto.builder()
+                            .teamId(team.getTeamId())
+                            .teamName(team.getTeamName())
+                            .teamInfo(team.getTeamInfo())
+                            .createdAt(team.getCreatedAt())
+                            .teamLocation(team.getTeamLocation())
+                            .teamImg(team.getTeamImg())
+                            .activityDays(team.getActivityDays())
+                            .teamMemberCount(teamMemberCount)  // 팀원 수 포함
+                            .members(members)  // 팀원 리스트 포함
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
 
