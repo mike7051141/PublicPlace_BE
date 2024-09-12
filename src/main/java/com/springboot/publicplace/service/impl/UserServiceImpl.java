@@ -7,10 +7,12 @@ import com.springboot.publicplace.dto.request.KakaoUserUpdateDto;
 import com.springboot.publicplace.dto.request.LocalUserUpdateDto;
 import com.springboot.publicplace.dto.response.MyPageTeamResponseDto;
 import com.springboot.publicplace.dto.response.UserResponseDto;
+import com.springboot.publicplace.entity.Team;
 import com.springboot.publicplace.entity.TeamJoinRequest;
 import com.springboot.publicplace.entity.TeamUser;
 import com.springboot.publicplace.entity.User;
 import com.springboot.publicplace.repository.TeamJoinRequestRepository;
+import com.springboot.publicplace.repository.TeamRepository;
 import com.springboot.publicplace.repository.TeamUserRepository;
 import com.springboot.publicplace.repository.UserRepository;
 import com.springboot.publicplace.service.UserService;
@@ -30,6 +32,8 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final TeamUserRepository teamUserRepository;
     private final TeamJoinRequestRepository teamJoinRequestRepository;
+    private final TeamRepository teamRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -149,11 +153,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResultDto deleteTeamJoinRequest(HttpServletRequest servletRequest, Long requestId) {
+    public ResultDto deleteTeamJoinRequest(HttpServletRequest servletRequest, Long teamId) {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);
-        return new ResultDto();
+
+        ResultDto resultDto = new ResultDto();
+
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+        TeamJoinRequest teamJoinRequest = teamJoinRequestRepository.findByTeamAndUser(team, user);
+        if (teamJoinRequest != null) {
+            teamJoinRequestRepository.delete(teamJoinRequest);
+            resultDto.setSuccess(true);
+            resultDto.setMsg("팀 신청이 취소 되었습니다.");
+        }else {
+            resultDto.setSuccess(false);
+            resultDto.setMsg("팀 신청취소 중 오류가 발생하였습니다.");
+        }
+        return resultDto;
     }
 
     private void setSuccess(ResultDto resultDto){
