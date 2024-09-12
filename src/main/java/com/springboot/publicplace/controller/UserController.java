@@ -51,9 +51,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(myPageTeamResponseDtos);
     }
     @DeleteMapping("/deleteTeamJoinRequest")
-    public ResponseEntity<ResultDto> deleteTeamJoinRequest(HttpServletRequest servletRequest,
-                                                           @PathVariable Long requestId ) {
-        ResultDto resultDto = userService.deleteTeamJoinRequest(servletRequest, requestId);
+    public ResponseEntity<ResultDto> deleteTeamJoinRequest(HttpServletRequest servletRequest, Long teamId ) {
+        ResultDto resultDto = userService.deleteTeamJoinRequest(servletRequest, teamId);
         return ResponseEntity.status(HttpStatus.OK).body(resultDto);
     }
 }

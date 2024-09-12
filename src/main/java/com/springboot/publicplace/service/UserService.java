@@ -20,5 +20,5 @@ public interface UserService {
 
     List<MyPageTeamResponseDto> getAppliedTeams(HttpServletRequest servletRequest);
 
-    ResultDto deleteTeamJoinRequest(HttpServletRequest servletRequest, Long requestId);
+    ResultDto deleteTeamJoinRequest(HttpServletRequest servletRequest, Long teamId);
 }
