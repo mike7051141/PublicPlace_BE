@@ -1,13 +1,12 @@
 package com.springboot.publicplace.controller;
 
 import com.springboot.publicplace.dto.ResultDto;
-import com.springboot.publicplace.dto.request.UserUpdateDto;
+import com.springboot.publicplace.dto.request.KakaoUserUpdateDto;
+import com.springboot.publicplace.dto.request.LocalUserUpdateDto;
 import com.springboot.publicplace.dto.response.MyPageTeamResponseDto;
-import com.springboot.publicplace.dto.response.TeamResponseDto;
 import com.springboot.publicplace.dto.response.UserResponseDto;
 import com.springboot.publicplace.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,10 +26,17 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
-    @PutMapping("/updateUser")
-    public ResponseEntity<ResultDto> updateUser(HttpServletRequest servletRequest,
-                                                @RequestBody UserUpdateDto userUpdateDto) {
-        ResultDto resultDto = userService.updateUser(servletRequest, userUpdateDto);
+    @PutMapping("/updateKakaoUser")
+    public ResponseEntity<ResultDto> updateKakaoUser(HttpServletRequest servletRequest,
+                                                     @RequestBody KakaoUserUpdateDto kakaoUserUpdateDto) {
+        ResultDto resultDto = userService.updateKakaoUser(servletRequest, kakaoUserUpdateDto);
+        return ResponseEntity.status(HttpStatus.OK).body(resultDto);
+    }
+
+    @PutMapping("/updateLocalUser")
+    public ResponseEntity<ResultDto> updateLocalUser(HttpServletRequest servletRequest,
+                                                @RequestBody LocalUserUpdateDto localUserUpdateDto) {
+        ResultDto resultDto = userService.updateLocalUser(servletRequest, localUserUpdateDto);
         return ResponseEntity.status(HttpStatus.OK).body(resultDto);
     }
 

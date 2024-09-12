@@ -7,9 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserUpdateDto {
+public class LocalUserUpdateDto {
     private String phoneNumber;
     private String nickname;
+    private String password;
     private String profileImg;
     private String gender;
     private String foot;

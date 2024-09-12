@@ -5,6 +5,7 @@ import com.springboot.publicplace.dto.request.TeamRequestDto;
 import com.springboot.publicplace.dto.response.TeamResponseDto;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 public interface TeamService{
     ResultDto createTeam(HttpServletRequest request, TeamRequestDto teamRequestDto);
@@ -12,4 +13,6 @@ public interface TeamService{
     ResultDto updateTeam(Long teamId, HttpServletRequest request, TeamRequestDto teamRequestDto);
 
     TeamResponseDto getTeamInfo(Long teamId);
+
+    List<TeamResponseDto> getTeamList(HttpServletRequest servletRequest);
 }

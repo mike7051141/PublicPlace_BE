@@ -3,6 +3,7 @@ package com.springboot.publicplace.controller;
 import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
 import com.springboot.publicplace.dto.response.TeamResponseDto;
+import com.springboot.publicplace.entity.Team;
 import com.springboot.publicplace.service.TeamJoinService;
 import com.springboot.publicplace.service.TeamService;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.Id;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/team")
@@ -39,4 +42,9 @@ public class TeamController {
         return ResponseEntity.ok(teamInfo);
     }
 
+    @GetMapping("/getTeamList")
+    public ResponseEntity<List<TeamResponseDto>> getTeamList(HttpServletRequest servletRequest) {
+        List<TeamResponseDto> teamList = teamService.getTeamList(servletRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(teamList);
+    }
 }

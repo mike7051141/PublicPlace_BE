@@ -8,7 +8,6 @@ import com.springboot.publicplace.dto.SignDto.SignUpDto;
 import com.springboot.publicplace.dto.SignDto.SignUpResultDto;
 import com.springboot.publicplace.entity.User;
 import com.springboot.publicplace.repository.UserRepository;
-import com.springboot.publicplace.service.S3UploadService;
 import com.springboot.publicplace.service.SignService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,6 @@ public class SignServiceImpl implements SignService {
     private JwtTokenProvider jwtTokenProvider;
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
-    private S3UploadService s3Service;
 
     @Autowired
     public SignServiceImpl(UserRepository userRepository , JwtTokenProvider jwtTokenProvider,
