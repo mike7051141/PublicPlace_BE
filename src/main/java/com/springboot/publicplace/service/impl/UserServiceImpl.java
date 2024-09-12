@@ -153,7 +153,7 @@ public class UserServiceImpl implements UserService {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);
-        
+        return new ResultDto();
     }
 
     private void setSuccess(ResultDto resultDto){
