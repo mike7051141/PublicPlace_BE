@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
             resultDto.setSuccess(true);
             resultDto.setMsg("카카오 유저 정보 업데이트를 완료하였습니다.");
-        }else {
+        } else {
             resultDto.setSuccess(false);
             resultDto.setMsg("카카오 유저 정보 업데이트를 실패하였습니다.");
         }
@@ -84,13 +84,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResultDto updateLocalUser (HttpServletRequest servletRequest, LocalUserUpdateDto localUserUpdateDto) {
+    public ResultDto updateLocalUser(HttpServletRequest servletRequest, LocalUserUpdateDto localUserUpdateDto) {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);
 
         ResultDto resultDto = new ResultDto();
-        if (jwtTokenProvider.validationToken(token) && user.getLoginApproach().equals("Kakao-Login")) {
+        if (jwtTokenProvider.validationToken(token) && user.getLoginApproach().equals("Local-Login")) {
             User localUser = userRepository.findByEmail(email);
             localUser.setNickname(localUserUpdateDto.getNickname());
             localUser.setGender(localUserUpdateDto.getGender());
@@ -146,6 +146,14 @@ public class UserServiceImpl implements UserService {
                         .teamCreationDate(teamJoinRequest.getTeam().getCreatedAt().toString()) // 창단일
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ResultDto deleteTeamJoinRequest(HttpServletRequest servletRequest, Long requestId) {
+        String token = jwtTokenProvider.resolveToken(servletRequest);
+        String email = jwtTokenProvider.getUsername(token);
+        User user = userRepository.findByEmail(email);
+        
     }
 
     private void setSuccess(ResultDto resultDto){
