@@ -50,4 +50,10 @@ public class UserController {
         List<MyPageTeamResponseDto> myPageTeamResponseDtos = userService.getAppliedTeams(servletRequest);
         return ResponseEntity.status(HttpStatus.OK).body(myPageTeamResponseDtos);
     }
+//    @DeleteMapping("/deleteTeamJoinRequest")
+//    public ResponseEntity<ResultDto> deleteTeamJoinRequest(HttpServletRequest servletRequest,
+//                                                           @PathVariable Long requestId ) {
+//        ResultDto resultDto = userService.deleteTeamJoinRequest(servletRequest, requestId);
+//        return ResponseEntity.status(HttpStatus.OK).body(resultDto);
+//    }
 }

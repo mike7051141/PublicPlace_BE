@@ -74,9 +74,11 @@ public class UserServiceImpl implements UserService {
             kakaoUser.setPosition(kakaoUserUpdateDto.getPosition());
             kakaoUser.setUpdatedAt(LocalDateTime.now());
             userRepository.save(user);
-            setSuccess(resultDto);
+            resultDto.setSuccess(true);
+            resultDto.setMsg("카카오 유저 정보 업데이트를 완료하였습니다.");
         }else {
-            setFail(resultDto);
+            resultDto.setSuccess(false);
+            resultDto.setMsg("카카오 유저 정보 업데이트를 실패하였습니다.");
         }
         return resultDto;
     }
@@ -99,9 +101,11 @@ public class UserServiceImpl implements UserService {
             localUser.setPosition(localUserUpdateDto.getPosition());
             localUser.setUpdatedAt(LocalDateTime.now());
             userRepository.save(user);
-            setSuccess(resultDto);
-        } else {
-            setFail(resultDto);
+            resultDto.setSuccess(true);
+            resultDto.setMsg("로컬 유저 정보 업데이트를 완료하였습니다.");
+        }else {
+            resultDto.setSuccess(false);
+            resultDto.setMsg("로컬 유저 정보 업데이트를 실패하였습니다.");
         }
         return resultDto;
     }
