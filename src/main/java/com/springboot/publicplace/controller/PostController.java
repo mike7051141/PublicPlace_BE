@@ -8,6 +8,7 @@ import com.springboot.publicplace.dto.response.CommentResponseDto;
 import com.springboot.publicplace.dto.response.PostDetailResponseDto;
 import com.springboot.publicplace.dto.response.PostListResponseDto;
 import com.springboot.publicplace.service.PostService;
+import io.swagger.annotations.ApiParam;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -48,10 +49,15 @@ public class PostController {
 
     @GetMapping("/getPostsByCategory")
     public ResponseEntity<List<PostListResponseDto>> getPostsByCategory(
+            @ApiParam(value = "카테고리", allowableValues = "전체, 자유, 해외축구, 국내축구, 직관모임", required = true)
             @RequestParam(defaultValue = "전체") String category,
+
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "latest") String sortBy) {
-        List<PostListResponseDto> postListResponseDtos = postService.getPostsByCategory(category, page-1, sortBy);
+
+            @ApiParam(value = "정렬 기준", allowableValues = "views, likes, createdAt", required = true)
+            @RequestParam(defaultValue = "createdAt") String sortBy) {
+
+        List<PostListResponseDto> postListResponseDtos = postService.getPostsByCategory(category, page - 1, sortBy);
         return ResponseEntity.status(HttpStatus.OK).body(postListResponseDtos);
     }
 
