@@ -5,6 +5,7 @@ import com.springboot.publicplace.dto.CommonResponse;
 import com.springboot.publicplace.dto.MemberDto;
 import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
+import com.springboot.publicplace.dto.response.TeamListResponseDto;
 import com.springboot.publicplace.dto.response.TeamResponseDto;
 import com.springboot.publicplace.entity.Team;
 import com.springboot.publicplace.entity.TeamUser;
@@ -14,6 +15,7 @@ import com.springboot.publicplace.repository.TeamUserRepository;
 import com.springboot.publicplace.repository.UserRepository;
 import com.springboot.publicplace.service.TeamService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -160,6 +162,43 @@ public class TeamServiceImpl implements TeamService {
                 })
                 .collect(Collectors.toList());
     }
+
+    public List<TeamListResponseDto> getTeamsByCriteria(String sortBy) {
+
+        Sort sort;
+
+        // 정렬 조건에 따라 분기 처리
+        if (sortBy.equals("memberCount")) {
+            // 회원 수 기준 내림차순 정렬
+            sort = Sort.by(Sort.Direction.DESC, "teamMemberCount").and(Sort.by(Sort.Direction.DESC, "createdAt"));
+        } else if (sortBy.equals("averageAge")) {
+            // 평균 나이 기준 오름차순 정렬
+            sort = Sort.by(Sort.Direction.ASC, "averageAge").and(Sort.by(Sort.Direction.DESC, "createdAt"));
+        } else if (sortBy.equals("oldest")) {
+            // 창단연도가 오래된 팀 순 정렬
+            sort = Sort.by(Sort.Direction.ASC, "createdAt");
+        } else {
+            // 최근에 창단된 팀 순 정렬 (기본)
+            sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        }
+
+        // 정렬된 팀 리스트 가져오기
+        List<Team> teams = teamRepository.findAll(sort); // 모든 팀을 가져오면서 정렬 적용
+
+        // Team 엔티티에서 TeamListResponseDto로 변환
+        List<TeamListResponseDto> teamList = teams.stream().map(team -> TeamListResponseDto.builder()
+                .teamId(team.getTeamId())
+                .teamName(team.getTeamName())
+                .createdAt(team.getCreatedAt())
+                .teamLocation(team.getTeamLocation())
+                .teamImg(team.getTeamImg())
+                .teamMemberCount(team.getTeamMembers()) // 회원 수
+                .averageAge(team.getAverageAge()) // 평균 연령 추가
+                .build()).collect(Collectors.toList());
+
+        return teamList; // 리스트 반환
+    }
+
 
 
     private void setSuccess(ResultDto resultDto){

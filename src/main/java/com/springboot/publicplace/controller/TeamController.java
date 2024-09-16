@@ -2,10 +2,12 @@ package com.springboot.publicplace.controller;
 
 import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
+import com.springboot.publicplace.dto.response.TeamListResponseDto;
 import com.springboot.publicplace.dto.response.TeamResponseDto;
 import com.springboot.publicplace.entity.Team;
 import com.springboot.publicplace.service.TeamJoinService;
 import com.springboot.publicplace.service.TeamService;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,5 +48,14 @@ public class TeamController {
     public ResponseEntity<List<TeamResponseDto>> getTeamList(HttpServletRequest servletRequest) {
         List<TeamResponseDto> teamList = teamService.getTeamList(servletRequest);
         return ResponseEntity.status(HttpStatus.OK).body(teamList);
+    }
+
+    @GetMapping("/sorted")
+    public ResponseEntity<List<TeamListResponseDto>> getTeamsSorted(
+            @ApiParam(value = "정렬 기준", allowableValues = "memberCount, averageAge, oldest, newest", required = true)
+            @RequestParam String sortBy) {
+
+        List<TeamListResponseDto> teams = teamService.getTeamsByCriteria(sortBy);
+        return ResponseEntity.status(HttpStatus.OK).body(teams);
     }
 }
