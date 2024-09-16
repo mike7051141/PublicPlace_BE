@@ -41,4 +41,20 @@ public class Team extends BaseEntity{
         return (long) teamUsers.size();
     }
 
+    // 범위의 중간값을 이용해 평균 나이를 계산하는 방식
+    @Transient
+    public double getAverageAge() {
+        return teamUsers.stream()
+                .mapToDouble(teamUser -> {
+                    String ageRange = teamUser.getUser().getAgeRange();
+                    String[] range = ageRange.split("~");
+                    int lower = Integer.parseInt(range[0].trim());
+                    int upper = Integer.parseInt(range[1].trim());
+                    return (lower + upper) / 2.0; // 중간값을 계산
+                })
+                .average()
+                .orElse(0); // 평균을 계산, 팀원이 없으면 0 반환
+    }
+
+
 }
