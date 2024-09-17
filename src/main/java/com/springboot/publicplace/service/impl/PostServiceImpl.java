@@ -177,6 +177,7 @@ public class PostServiceImpl implements PostService {
         PostDetailResponseDto postDetailResponseDto = new PostDetailResponseDto();
         postDetailResponseDto.setTitle(post.getTitle());
         postDetailResponseDto.setCategory(post.getCategory());
+        postDetailResponseDto.setProfileImg(post.getUser().getProfileImg());
         postDetailResponseDto.setContent(post.getContent());
         postDetailResponseDto.setPostImg(post.getPostImg());
         postDetailResponseDto.setAuthorNickname(post.getUser().getNickname());
