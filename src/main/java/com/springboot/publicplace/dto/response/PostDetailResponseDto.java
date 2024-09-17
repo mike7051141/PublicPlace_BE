@@ -13,6 +13,7 @@ import java.util.List;
 public class PostDetailResponseDto {
     private String title;
     private String category;
+    private String profileImg;
     private String content;
     private String postImg;
     private String authorNickname;
