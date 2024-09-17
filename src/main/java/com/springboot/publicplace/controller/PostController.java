@@ -3,15 +3,11 @@ package com.springboot.publicplace.controller;
 import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.CommentRequestDto;
 import com.springboot.publicplace.dto.request.PostRequestDto;
-import com.springboot.publicplace.dto.request.TeamRequestDto;
-import com.springboot.publicplace.dto.response.CommentResponseDto;
 import com.springboot.publicplace.dto.response.PostDetailResponseDto;
 import com.springboot.publicplace.dto.response.PostListResponseDto;
 import com.springboot.publicplace.service.PostService;
 import io.swagger.annotations.ApiParam;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -88,9 +84,4 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(resultDto);
     }
 
-//    @GetMapping("/getComments/{postId}")
-//    public ResponseEntity<List<CommentResponseDto>> getCommentsByPost(@PathVariable Long postId) {
-//        List<CommentResponseDto> commentResponseDtoList = postService.getCommentsByPost(postId);
-//        return ResponseEntity.status(HttpStatus.OK).body(commentResponseDtoList);
-//    }
 }
