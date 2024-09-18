@@ -51,9 +51,10 @@ public class PostController {
             @RequestParam(defaultValue = "1") int page,
 
             @ApiParam(value = "정렬 기준", allowableValues = "views, likes, createdAt", required = true)
-            @RequestParam(defaultValue = "createdAt") String sortBy) {
-
-        List<PostListResponseDto> postListResponseDtos = postService.getPostsByCategory(category, page - 1, sortBy);
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @ApiParam(value = "검색할 게시글 제목", required = false)
+            @RequestParam(required = false) String title) {
+        List<PostListResponseDto> postListResponseDtos = postService.getPostsByCategory(category, page - 1, sortBy, title);
         return ResponseEntity.status(HttpStatus.OK).body(postListResponseDtos);
     }
 
