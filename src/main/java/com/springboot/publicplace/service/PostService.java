@@ -5,7 +5,6 @@ import com.springboot.publicplace.dto.request.CommentRequestDto;
 import com.springboot.publicplace.dto.request.PostRequestDto;
 import com.springboot.publicplace.dto.response.PostDetailResponseDto;
 import com.springboot.publicplace.dto.response.PostListResponseDto;
-import org.springframework.data.domain.Page;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -17,7 +16,7 @@ public interface PostService {
 
     ResultDto deletePost(Long postId, HttpServletRequest servletRequest);
 
-    List<PostListResponseDto> getPostsByCategory(String category, int page, String sortBy);
+    List<PostListResponseDto> getPostsByCategory(String category, int page, String sortBy, String title);
 
     PostDetailResponseDto getPostDetails(Long postId, HttpServletRequest servletRequest);
 
