@@ -48,13 +48,25 @@ public class Team extends BaseEntity{
                 .mapToDouble(teamUser -> {
                     String ageRange = teamUser.getUser().getAgeRange();
                     String[] range = ageRange.split("~");
-                    int lower = Integer.parseInt(range[0].trim());
-                    int upper = Integer.parseInt(range[1].trim());
-                    return (lower + upper) / 2.0; // 중간값을 계산
+
+                    if (range.length != 2) {
+                        System.err.println("Invalid age range format: " + ageRange);
+                        return 0;
+                    }
+
+                    try {
+                        int lower = Integer.parseInt(range[0].trim());
+                        int upper = Integer.parseInt(range[1].trim());
+                        return (lower + upper) / 2.0; // 중간값을 계산
+                    } catch (NumberFormatException e) {
+                        System.err.println("Invalid age range values: " + ageRange);
+                        return 0; // 기본값 0 반환
+                    }
                 })
                 .average()
                 .orElse(0); // 평균을 계산, 팀원이 없으면 0 반환
     }
+
 
 
 }

@@ -50,12 +50,12 @@ public class TeamController {
         return ResponseEntity.status(HttpStatus.OK).body(teamList);
     }
 
-//    @GetMapping("/sorted")
-//    public ResponseEntity<List<TeamListResponseDto>> getTeamsSorted(
-//            @ApiParam(value = "정렬 기준", allowableValues = "memberCount, averageAge, oldest, newest", required = true)
-//            @RequestParam String sortBy) {
-//
-//        List<TeamListResponseDto> teams = teamService.getTeamsByCriteria(sortBy);
-//        return ResponseEntity.status(HttpStatus.OK).body(teams);
-//    }
+    @GetMapping("/sorted")
+    public ResponseEntity<List<TeamListResponseDto>> getTeamsSorted(
+            @ApiParam(value = "정렬 기준", allowableValues = "memberCount, averageAge, oldest, newest", required = true)
+            @RequestParam String sortBy) {
+
+        List<TeamListResponseDto> teams = teamService.getTeamsByCriteria(sortBy);
+        return ResponseEntity.status(HttpStatus.OK).body(teams);
+    }
 }
