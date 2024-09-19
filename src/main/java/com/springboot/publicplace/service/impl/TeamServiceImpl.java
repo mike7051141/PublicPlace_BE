@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -163,27 +164,41 @@ public class TeamServiceImpl implements TeamService {
                 .collect(Collectors.toList());
     }
 
-    public List<TeamListResponseDto> getTeamsByCriteria(String sortBy) {
+    public List<TeamListResponseDto> getTeamsByCriteria(String sortBy, String teamName) {
+        List<Team> teams;
 
-        Sort sort;
-
-        // 정렬 조건에 따라 분기 처리
-        if (sortBy.equals("memberCount")) {
-            // 회원 수 기준 내림차순 정렬
-            sort = Sort.by(Sort.Direction.DESC, "teamMemberCount").and(Sort.by(Sort.Direction.DESC, "createdAt"));
-        } else if (sortBy.equals("averageAge")) {
-            // 평균 나이 기준 오름차순 정렬
-            sort = Sort.by(Sort.Direction.ASC, "averageAge").and(Sort.by(Sort.Direction.DESC, "createdAt"));
-        } else if (sortBy.equals("oldest")) {
-            // 창단연도가 오래된 팀 순 정렬
-            sort = Sort.by(Sort.Direction.ASC, "createdAt");
+        // 검색어가 있을 경우 팀명으로 검색, 없으면 전체 팀 목록 조회
+        if (teamName != null && !teamName.isEmpty()) {
+            teams = teamRepository.findByTeamNameContaining(teamName);
         } else {
-            // 최근에 창단된 팀 순 정렬 (기본)
-            sort = Sort.by(Sort.Direction.DESC, "createdAt");
+            // 검색어가 없을 경우 전체 팀 목록 조회
+            teams = teamRepository.findAll();
         }
 
-        // 정렬된 팀 리스트 가져오기
-        List<Team> teams = teamRepository.findAll(sort); // 모든 팀을 가져오면서 정렬 적용
+        // 정렬 기준에 따라 처리
+        if (sortBy.equals("averageAge")) {
+            // 평균 나이 기준으로 정렬
+            teams = teams.stream()
+                    .sorted(Comparator.comparingDouble(Team::getAverageAge)
+                            .thenComparing(Team::getCreatedAt, Comparator.reverseOrder()))
+                    .collect(Collectors.toList());
+        } else if (sortBy.equals("memberCount")) {
+            // 팀 멤버 수 기준으로 정렬
+            teams = teams.stream()
+                    .sorted(Comparator.comparingLong(Team::getTeamMembers).reversed()
+                            .thenComparing(Team::getCreatedAt, Comparator.reverseOrder()))
+                    .collect(Collectors.toList());
+        } else if (sortBy.equals("oldest")) {
+            // 창단연도 기준 오름차순 정렬
+            teams = teams.stream()
+                    .sorted(Comparator.comparing(Team::getCreatedAt))
+                    .collect(Collectors.toList());
+        } else {
+            // 기본: 창단연도 기준 내림차순 정렬
+            teams = teams.stream()
+                    .sorted(Comparator.comparing(Team::getCreatedAt).reversed())
+                    .collect(Collectors.toList());
+        }
 
         // Team 엔티티에서 TeamListResponseDto로 변환
         List<TeamListResponseDto> teamList = teams.stream().map(team -> TeamListResponseDto.builder()
@@ -192,13 +207,12 @@ public class TeamServiceImpl implements TeamService {
                 .createdAt(team.getCreatedAt())
                 .teamLocation(team.getTeamLocation())
                 .teamImg(team.getTeamImg())
-                .teamMemberCount(team.getTeamMembers()) // 회원 수
-                .averageAge(team.getAverageAge()) // 평균 연령 추가
+                .teamMemberCount(team.getTeamMembers()) // 팀 멤버 수
+                .averageAge(team.getAverageAge())       // 평균 나이
                 .build()).collect(Collectors.toList());
 
-        return teamList; // 리스트 반환
+        return teamList;
     }
-
 
 
     private void setSuccess(ResultDto resultDto){
