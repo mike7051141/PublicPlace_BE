@@ -20,6 +20,6 @@ public interface TeamService{
 
     List<TeamResponseDto> getTeamList(HttpServletRequest servletRequest);
 
-    List<TeamListResponseDto> getTeamsByCriteria(String sortBy);
+    List<TeamListResponseDto> getTeamsByCriteria(String sortBy, String teamName);
 
 }

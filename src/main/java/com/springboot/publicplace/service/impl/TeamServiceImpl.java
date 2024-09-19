@@ -164,29 +164,40 @@ public class TeamServiceImpl implements TeamService {
                 .collect(Collectors.toList());
     }
 
-    public List<TeamListResponseDto> getTeamsByCriteria(String sortBy) {
+    public List<TeamListResponseDto> getTeamsByCriteria(String sortBy, String teamName) {
         List<Team> teams;
 
+        // 검색어가 있을 경우 팀명으로 검색, 없으면 전체 팀 목록 조회
+        if (teamName != null && !teamName.isEmpty()) {
+            teams = teamRepository.findByTeamNameContaining(teamName);
+        } else {
+            // 검색어가 없을 경우 전체 팀 목록 조회
+            teams = teamRepository.findAll();
+        }
+
+        // 정렬 기준에 따라 처리
         if (sortBy.equals("averageAge")) {
             // 평균 나이 기준으로 정렬
-            teams = teamRepository.findAll().stream()
+            teams = teams.stream()
                     .sorted(Comparator.comparingDouble(Team::getAverageAge)
                             .thenComparing(Team::getCreatedAt, Comparator.reverseOrder()))
                     .collect(Collectors.toList());
         } else if (sortBy.equals("memberCount")) {
             // 팀 멤버 수 기준으로 정렬
-            teams = teamRepository.findAllByMemberCountDesc();
+            teams = teams.stream()
+                    .sorted(Comparator.comparingLong(Team::getTeamMembers).reversed()
+                            .thenComparing(Team::getCreatedAt, Comparator.reverseOrder()))
+                    .collect(Collectors.toList());
+        } else if (sortBy.equals("oldest")) {
+            // 창단연도 기준 오름차순 정렬
+            teams = teams.stream()
+                    .sorted(Comparator.comparing(Team::getCreatedAt))
+                    .collect(Collectors.toList());
         } else {
-            Sort sort;
-
-            if (sortBy.equals("oldest")) {
-                sort = Sort.by(Sort.Direction.ASC, "createdAt");
-            } else {
-                // 최근에 창단된 팀 순으로 정렬 (기본 정렬)
-                sort = Sort.by(Sort.Direction.DESC, "createdAt");
-            }
-
-            teams = teamRepository.findAll(sort);
+            // 기본: 창단연도 기준 내림차순 정렬
+            teams = teams.stream()
+                    .sorted(Comparator.comparing(Team::getCreatedAt).reversed())
+                    .collect(Collectors.toList());
         }
 
         // Team 엔티티에서 TeamListResponseDto로 변환
@@ -202,8 +213,6 @@ public class TeamServiceImpl implements TeamService {
 
         return teamList;
     }
-
-
 
 
     private void setSuccess(ResultDto resultDto){
