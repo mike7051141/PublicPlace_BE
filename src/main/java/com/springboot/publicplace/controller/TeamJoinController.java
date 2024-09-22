@@ -4,7 +4,6 @@ import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.response.TeamJoinDetailResponseDto;
 import com.springboot.publicplace.dto.response.TeamJoinResponseDto;
 import com.springboot.publicplace.service.TeamJoinService;
-import com.springboot.publicplace.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
