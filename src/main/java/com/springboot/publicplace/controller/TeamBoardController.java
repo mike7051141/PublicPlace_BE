@@ -2,7 +2,6 @@ package com.springboot.publicplace.controller;
 
 import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamBoardRequestDto;
-import com.springboot.publicplace.dto.response.PostListResponseDto;
 import com.springboot.publicplace.dto.response.TeamBoardDetailResponseDto;
 import com.springboot.publicplace.dto.response.TeamBoardListResponseDto;
 import com.springboot.publicplace.service.TeamBoardService;
