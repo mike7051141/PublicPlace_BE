@@ -22,8 +22,6 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
-    @Column(unique = true)
     private String title;
     private String content;
     private int liked;
