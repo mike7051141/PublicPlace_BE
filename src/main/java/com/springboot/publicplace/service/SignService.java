@@ -4,9 +4,6 @@ import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.SignDto.SignInResultDto;
 import com.springboot.publicplace.dto.SignDto.SignUpDto;
 import com.springboot.publicplace.dto.SignDto.SignUpResultDto;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 public interface SignService {
 

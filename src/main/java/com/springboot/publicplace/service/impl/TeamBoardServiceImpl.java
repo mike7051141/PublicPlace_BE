@@ -6,7 +6,6 @@ import com.springboot.publicplace.dto.request.TeamBoardRequestDto;
 import com.springboot.publicplace.dto.response.TeamBoardCommentResponseDto;
 import com.springboot.publicplace.dto.response.TeamBoardDetailResponseDto;
 import com.springboot.publicplace.dto.response.TeamBoardListResponseDto;
-import com.springboot.publicplace.dto.response.TeamJoinResponseDto;
 import com.springboot.publicplace.entity.*;
 import com.springboot.publicplace.repository.*;
 import com.springboot.publicplace.service.TeamBoardService;
