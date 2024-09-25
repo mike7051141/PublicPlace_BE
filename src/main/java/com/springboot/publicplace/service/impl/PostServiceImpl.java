@@ -4,7 +4,6 @@ import com.springboot.publicplace.config.security.JwtTokenProvider;
 import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.CommentRequestDto;
 import com.springboot.publicplace.dto.request.PostRequestDto;
-import com.springboot.publicplace.dto.response.CommentResponseDto;
 import com.springboot.publicplace.dto.response.PostCommentResponseDto;
 import com.springboot.publicplace.dto.response.PostDetailResponseDto;
 import com.springboot.publicplace.dto.response.PostListResponseDto;
