@@ -59,9 +59,11 @@ public class TeamBoardServiceImpl implements TeamBoardService {
 
             resultDto.setSuccess(true);
             resultDto.setMsg("팀 게시글이 성공적으로 작성되었습니다.");
+            resultDto.setCode(200);
         } catch (Exception e) {
             resultDto.setSuccess(false);
             resultDto.setMsg("팀 게시글 작성에 실패함: " + e.getMessage());
+            resultDto.setCode(500);
         }
         return resultDto;
     }
@@ -85,12 +87,14 @@ public class TeamBoardServiceImpl implements TeamBoardService {
 
                 resultDto.setMsg("팀 게시글이 성공적으로 수정되었습니다.");
                 resultDto.setSuccess(true);
+                resultDto.setCode(200);
             } else {
                 throw new AccessDeniedException("본인이 작성한 글만 수정 가능합니다.");
             }
         }catch (Exception e){
             resultDto.setSuccess(false);
             resultDto.setMsg("팀 게시글 수정에 실패: " + e.getMessage());
+            resultDto.setCode(500);
         }
         return resultDto;
     }
@@ -170,12 +174,14 @@ public class TeamBoardServiceImpl implements TeamBoardService {
                 teamBoardRepository.delete(teamBoard);
                 resultDto.setMsg("팀 게시글이 성공적으로 삭제되었습니다.");
                 resultDto.setSuccess(true);
+                resultDto.setCode(200);
             } else {
                 throw new RuntimeException("본인이 작성한 글만 삭제 가능합니다.");
             }
         }catch (Exception e){
             resultDto.setSuccess(false);
             resultDto.setMsg("팀 게시글 삭제에 실패: " + e.getMessage());
+            resultDto.setCode(500);
         }
         return resultDto;
     }
