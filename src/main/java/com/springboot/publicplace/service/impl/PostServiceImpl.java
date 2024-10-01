@@ -50,12 +50,12 @@ public class PostServiceImpl implements PostService {
             // 토큰 유효성 검증
             if (jwtTokenProvider.validationToken(token)) {
                 // Post 객체 생성 및 데이터 설정
-                Post post = new Post();
-                post.setTitle(postRequestDto.getTitle());
-                post.setContent(postRequestDto.getContent());
-                post.setCategory(postRequestDto.getCategory());
-                post.setPostImg(postRequestDto.getPostImg());
-                post.setUser(user); // 게시글 작성자 설정
+                Post post = Post.builder()
+                        .title(postRequestDto.getTitle())
+                        .content(postRequestDto.getContent())
+                        .category(postRequestDto.getCategory())
+                        .postImg(postRequestDto.getPostImg())
+                        .build();
 
                 // 게시글 저장
                 postRepository.save(post);
@@ -84,10 +84,12 @@ public class PostServiceImpl implements PostService {
             Post post = postRepository.findById(postId)
                     .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
             if (post.getUser().equals(user)) {
-                post.setTitle(postRequestDto.getTitle());
-                post.setContent(postRequestDto.getContent());
-                post.setCategory(postRequestDto.getCategory());
-                post.setPostImg(postRequestDto.getPostImg());
+                post = Post.builder()
+                        .title(postRequestDto.getTitle())
+                        .content(postRequestDto.getContent())
+                        .category(postRequestDto.getCategory())
+                        .postImg(postRequestDto.getPostImg())
+                        .build();
 
                 // 수정된 게시글 저장
                 postRepository.save(post);
@@ -181,19 +183,6 @@ public class PostServiceImpl implements PostService {
 
         post.setViewCount(post.getViewCount() + 1);
         postRepository.save(post);
-
-        PostDetailResponseDto postDetailResponseDto = new PostDetailResponseDto();
-        postDetailResponseDto.setTitle(post.getTitle());
-        postDetailResponseDto.setCategory(post.getCategory());
-        postDetailResponseDto.setProfileImg(post.getUser().getProfileImg());
-        postDetailResponseDto.setContent(post.getContent());
-        postDetailResponseDto.setPostImg(post.getPostImg());
-        postDetailResponseDto.setAuthorNickname(post.getUser().getNickname());
-        postDetailResponseDto.setCreatedDate(post.getCreatedAt());
-        postDetailResponseDto.setViewCount(post.getViewCount());
-        postDetailResponseDto.setLikeCount(post.getLiked());
-        postDetailResponseDto.setCommentCount(post.getComments().size());
-
         List<PostCommentResponseDto> postCommentResponseDtos = post.getComments().stream()
                 .map(comment -> {
                     PostCommentResponseDto postCommentResponseDto = new PostCommentResponseDto();
@@ -205,8 +194,20 @@ public class PostServiceImpl implements PostService {
                     return postCommentResponseDto;
                 })
                 .collect(Collectors.toList());
-        postDetailResponseDto.setComments(postCommentResponseDtos);
 
+        PostDetailResponseDto postDetailResponseDto = new PostDetailResponseDto(
+                post.getTitle(),
+                post.getCategory(),
+                post.getUser().getProfileImg(),
+                post.getContent(),
+                post.getPostImg(),
+                post.getUser().getNickname(),
+                post.getCreatedAt(),
+                post.getViewCount(),
+                post.getLiked(),
+                post.getComments().size(),
+                postCommentResponseDtos
+                );
         return postDetailResponseDto;
     }
 
@@ -299,22 +300,4 @@ public class PostServiceImpl implements PostService {
         }
         return resultDto;
     }
-
-//    @Override
-//    public List<CommentResponseDto> getCommentsByPost(Long postId) {
-//        List<Comment> comments = commentRepository.findByPost_PostId(postId);
-//
-//        List<CommentResponseDto> commentResponseDtoList = comments.stream()
-//                .map(comment -> {
-//                    CommentResponseDto commentResponseDto = new CommentResponseDto();
-//                    commentResponseDto.setProfileImg(comment.getUser().getProfileImg());
-//                    commentResponseDto.setNickname(comment.getUser().getNickname());
-//                    commentResponseDto.setContent(comment.getContent());
-//                    commentResponseDto.setCreatedDate(comment.getCreatedAt());
-//                    return commentResponseDto;
-//                })
-//                .collect(Collectors.toList());
-//
-//        return commentResponseDtoList;
-//    }
 }
