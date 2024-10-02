@@ -11,24 +11,33 @@ import com.springboot.publicplace.entity.Comment;
 import com.springboot.publicplace.entity.LikePost;
 import com.springboot.publicplace.entity.Post;
 import com.springboot.publicplace.entity.User;
+import com.springboot.publicplace.exception.InvalidTokenException;
+import com.springboot.publicplace.exception.ResourceNotFoundException;
+import com.springboot.publicplace.exception.UnauthorizedActionException;
 import com.springboot.publicplace.repository.CommentRepository;
 import com.springboot.publicplace.repository.LikePostRepository;
 import com.springboot.publicplace.repository.PostRepository;
 import com.springboot.publicplace.repository.UserRepository;
 import com.springboot.publicplace.service.PostService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.protocol.HTTP;
+import org.slf4j.ILoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
@@ -38,100 +47,97 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ResultDto createPost(HttpServletRequest servletRequest, PostRequestDto postRequestDto) {
-        // ResultDto 객체 초기화
-        ResultDto resultDto = new ResultDto();
+        String token = jwtTokenProvider.resolveToken(servletRequest);
+        String email = jwtTokenProvider.getUsername(token);
+        User user = userRepository.findByEmail(email);
 
-        try {
-            // 토큰에서 사용자 이메일 추출
-            String token = jwtTokenProvider.resolveToken(servletRequest);
-            String email = jwtTokenProvider.getUsername(token);
-            User user = userRepository.findByEmail(email);
-
-            // 토큰 유효성 검증
-            if (jwtTokenProvider.validationToken(token)) {
-                // Post 객체 생성 및 데이터 설정
-                Post post = Post.builder()
-                        .title(postRequestDto.getTitle())
-                        .content(postRequestDto.getContent())
-                        .category(postRequestDto.getCategory())
-                        .postImg(postRequestDto.getPostImg())
-                        .build();
-
-                // 게시글 저장
-                postRepository.save(post);
-
-                // 성공 시 결과 설정
-                resultDto.setSuccess(true);
-                resultDto.setMsg("게시글이 성공적으로 작성되었습니다.");
-            }
-        } catch (Exception e) {
-            // 예외 발생 시 실패 결과 설정
-            resultDto.setSuccess(false);
-            resultDto.setMsg("게시글 작성에 실패했습니다: " + e.getMessage());
+        // 토큰 유효성 검증
+        if (!jwtTokenProvider.validationToken(token)) {
+            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
         }
+
+        // Post 객체 생성 및 데이터 설정
+        Post post = Post.builder()
+                .user(user)
+                .title(postRequestDto.getTitle())
+                .content(postRequestDto.getContent())
+                .category(postRequestDto.getCategory())
+                .postImg(postRequestDto.getPostImg())
+                .build();
+
+        // 게시글 저장
+        postRepository.save(post);
+
+        // 성공 시 결과 설정
+        ResultDto resultDto = ResultDto.builder()
+                .success(true)
+                .msg("게시글이 성공적으로 작성되었습니다.")
+                .code(HttpStatus.OK.value())
+                .build();
+
         return resultDto;
     }
 
     @Override
+    @Transactional
     public ResultDto updatePost(Long postId, HttpServletRequest servletRequest, PostRequestDto postRequestDto) {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);;
 
-        ResultDto resultDto = new ResultDto();
-
-        if(jwtTokenProvider.validationToken(token)){
-            Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
-            if (post.getUser().equals(user)) {
-                post = Post.builder()
-                        .title(postRequestDto.getTitle())
-                        .content(postRequestDto.getContent())
-                        .category(postRequestDto.getCategory())
-                        .postImg(postRequestDto.getPostImg())
-                        .build();
-
-                // 수정된 게시글 저장
-                postRepository.save(post);
-
-                // 성공 시 결과 설정
-                resultDto.setSuccess(true);
-                resultDto.setMsg("게시글이 성공적으로 수정되었습니다.");
-            } else {
-                // 작성자가 아닌 경우
-                resultDto.setSuccess(false);
-                resultDto.setMsg("본인이 작성한 게시글만 수정할 수 있습니다.");
-            }
+        if(!jwtTokenProvider.validationToken(token)){
+            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
         }
+
+        // 게시글 조회 또는 예외 던지기
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("해당 게시글을 찾을 수 없습니다."));
+
+        // 작성자 확인 또는 예외 던지기
+        if (!post.getUser().equals(user)) {
+            throw new UnauthorizedActionException("본인이 작성한 게시글만 수정할 수 있습니다.");
+        }
+
+        post.setTitle(postRequestDto.getTitle());
+        post.setContent(postRequestDto.getContent());
+        post.setCategory(postRequestDto.getCategory());
+        post.setPostImg(postRequestDto.getPostImg());
+
+        // 수정된 게시글 저장
+        postRepository.save(post);
+
+        ResultDto resultDto = ResultDto.builder()
+                .success(true)
+                .msg("게시글이 성공적으로 수정되었습니다.")
+                .code(HttpStatus.OK.value())
+                .build();
         return resultDto;
     }
 
     @Override
+    @Transactional
     public ResultDto deletePost(Long postId, HttpServletRequest servletRequest) {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);;
 
-        ResultDto resultDto = new ResultDto();
-
-        if(jwtTokenProvider.validationToken(token)){
-            Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
-
-            if (post.getUser().equals(user)) {
-
-                // 게시글 삭제
-                postRepository.delete(post);
-
-                // 성공 시 결과 설정
-                resultDto.setSuccess(true);
-                resultDto.setMsg("게시글이 성공적으로 삭제되었습니다.");
-            } else {
-                // 작성자가 아닌 경우
-                resultDto.setSuccess(false);
-                resultDto.setMsg("본인이 작성한 게시글만 삭제할 수 있습니다.");
-            }
+        if(!jwtTokenProvider.validationToken(token)){
+            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
         }
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("해당 게시글을 찾을 수 없습니다."));
+
+        if (!post.getUser().equals(user)) {
+            throw new UnauthorizedActionException("본인이 작성한 게시글만 삭제할 수 있습니다.");
+        }
+
+        postRepository.delete(post);
+        ResultDto resultDto = ResultDto.builder()
+                .success(true)
+                .msg("게시글이 성공적으로 삭제되었습니다.")
+                .code(HttpStatus.OK.value())
+                .build();
         return resultDto;
     }
 
@@ -162,7 +168,7 @@ public class PostServiceImpl implements PostService {
         } else {
             posts = postRepository.findByCategory(category, pageable);
         }
-        Page<PostListResponseDto> postPage =posts.map(post -> PostListResponseDto.builder()
+        Page<PostListResponseDto> postPage = posts.map(post -> PostListResponseDto.builder()
                 .postId(post.getPostId())
                 .category(post.getCategory())
                 .title(post.getTitle())
@@ -179,7 +185,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDetailResponseDto getPostDetails(Long postId, HttpServletRequest servletRequest) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResourceNotFoundException("해당 게시글을 찾을 수 없습니다."));
 
         post.setViewCount(post.getViewCount() + 1);
         postRepository.save(post);
@@ -213,57 +219,49 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ResultDto createComment(HttpServletRequest servletRequest, CommentRequestDto commentRequestDto) {
-        ResultDto resultDto = new ResultDto();
-        try {
-            String token = jwtTokenProvider.resolveToken(servletRequest);
-            String email = jwtTokenProvider.getUsername(token);
-            User user = userRepository.findByEmail(email);
+        String token = jwtTokenProvider.resolveToken(servletRequest);
+        String email = jwtTokenProvider.getUsername(token);
+        User user = userRepository.findByEmail(email);
 
-            Post post = postRepository.findById(commentRequestDto.getPostId())
-                    .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
+        Post post = postRepository.findById(commentRequestDto.getPostId())
+                .orElseThrow(() -> new ResourceNotFoundException("해당 게시글을 찾을 수 없습니다."));
 
-            Comment comment = new Comment();
-            comment.setContent(commentRequestDto.getContent());
-            comment.setUser(user);
-            comment.setPost(post);
+        Comment comment = Comment.builder()
+                .content(commentRequestDto.getContent())
+                .user(user)
+                .post(post)
+                .build();
 
-            commentRepository.save(comment);
+        commentRepository.save(comment);
 
-            resultDto.setSuccess(true);
-            resultDto.setMsg("댓글이 성공적으로 작성되었습니다");
-        } catch (Exception e) {
-            resultDto.setSuccess(false);
-            resultDto.setMsg("댓글 작성에 실패했습니다: " + e.getMessage());
-        }
+        ResultDto resultDto = ResultDto.builder()
+                .success(true)
+                .msg("댓글이 성공적으로 작성되었습니다.")
+                .code(HttpStatus.OK.value())
+                .build();
         return resultDto;
     }
 
     @Override
     public ResultDto deleteComment(Long commentId, HttpServletRequest servletRequest) {
-        ResultDto resultDto = new ResultDto();
+        String token = jwtTokenProvider.resolveToken(servletRequest);
+        String email = jwtTokenProvider.getUsername(token);
+        User user = userRepository.findByEmail(email);;
 
-        try {
-            String token = jwtTokenProvider.resolveToken(servletRequest);
-            String email = jwtTokenProvider.getUsername(token);
-            User user = userRepository.findByEmail(email);
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("해당 댓글을 찾을 수 없습니다."));
 
-            Comment comment = commentRepository.findById(commentId)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 댓글을 찾을 수 없습니다."));
-
-            // 댓글 작성자 & 게시글 작성자만 댓글 삭제 가능
-            if (comment.getUser().equals(user) || comment.getPost().getUser().equals(user)) {
-                commentRepository.delete(comment);
-                resultDto.setSuccess(true);
-                resultDto.setMsg("댓글이 삭제되었습니다.");
-            } else {
-                // 권한이 없을 때
-                resultDto.setSuccess(false);
-                resultDto.setMsg("댓글을 삭제할 권한이 없습니다.");
-            }
-        } catch (Exception e) {
-            resultDto.setSuccess(false);
-            resultDto.setMsg("댓글을 삭제하는 도중 에러가 발생함: " + e.getMessage());
+        // 댓글 작성자 & 게시글 작성자만 댓글 삭제 가능
+        if (!comment.getUser().equals(user) || comment.getPost().getUser().equals(user)) {
+            throw new UnauthorizedActionException("댓글을 삭제할 권한이 없습니다.");
         }
+
+        commentRepository.delete(comment);
+        ResultDto resultDto = ResultDto.builder()
+                .success(true)
+                .msg("댓글이 삭제되었습니다.")
+                .code(HttpStatus.OK.value())
+                .build();
         return resultDto;
     }
 
@@ -271,33 +269,36 @@ public class PostServiceImpl implements PostService {
     public ResultDto toggleLike(Long postId, HttpServletRequest servletRequest) {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);;
 
-        ResultDto resultDto = new ResultDto();
-
-        if (jwtTokenProvider.validationToken(token)) {
-            Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
-            LikePost existingLike = likePostRepository.findByUserAndPost(user, post);
-
-            if (existingLike != null) {
-                likePostRepository.delete(existingLike);
-                post.setLiked(post.getLiked() - 1);
-                resultDto.setMsg("좋아요가 취소되었습니다");
-            } else {
-                LikePost likePost = new LikePost();
-                likePost.setUser(user);
-                likePost.setPost(post);
-                likePostRepository.save(likePost);
-                post.setLiked(post.getLiked() + 1);
-                resultDto.setMsg("좋아요가 추가되었습니다.");
-            }
-            postRepository.save(post);
-            resultDto.setSuccess(true);
-        } else {
-            resultDto.setSuccess(false);
-            resultDto.setMsg("로그인을 먼저 해주세요");
+        if (!jwtTokenProvider.validationToken(token)) {
+            throw new InvalidTokenException("로그인을 먼저 해주세요.");
         }
-        return resultDto;
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("해당 게시글을 찾을 수 없습니다."));
+
+        LikePost existingLike = likePostRepository.findByUserAndPost(user, post);
+
+        if (existingLike != null) {
+            likePostRepository.delete(existingLike);
+            post.setLiked(post.getLiked() - 1);
+            return ResultDto.builder()
+                    .success(true)
+                    .msg("좋아요가 취소되었습니다.")
+                    .code(HttpStatus.OK.value())
+                    .build();
+        } else {
+            LikePost likePost = new LikePost();
+            likePost.setUser(user);
+            likePost.setPost(post);
+            likePostRepository.save(likePost);
+            post.setLiked(post.getLiked() + 1);
+            return ResultDto.builder()
+                    .success(true)
+                    .msg("좋아요가 추가되었습니다.")
+                    .code(HttpStatus.OK.value())
+                    .build();
+        }
     }
 }
