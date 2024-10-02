@@ -160,7 +160,6 @@ public class KakaoServiceImpl implements KakaoService {
                 user.setAgeRange(requestSignUpDto.getAgeRange());
                 userRepository.save(user);
             }
-
             return requestSignUpDto;
         } catch (Exception e) {
             e.printStackTrace();
