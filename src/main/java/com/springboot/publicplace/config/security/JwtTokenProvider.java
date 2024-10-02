@@ -80,7 +80,6 @@ public class JwtTokenProvider {
     }
     //HTTP 헤더 정보에 X-AUTH-TOKEN 추가
     public String resolveToken(HttpServletRequest request){
-        logger.info("[resolveToken]:{}",request);
         return request.getHeader("X-AUTH-TOKEN");
     }
 

@@ -19,4 +19,6 @@ public interface TeamService{
 
     List<TeamListResponseDto> getTeamsByCriteria(String sortBy, String teamName);
 
+    ResultDto checkTeamName (String teamName);
+
 }

@@ -64,6 +64,20 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
+    public ResultDto checkTeamName (String teamName) {
+        ResultDto resultDto = new ResultDto();
+        if (teamRepository.existsByTeamName(teamName)) {
+            resultDto.setSuccess(false);
+            resultDto.setMsg("이미 존재하는 팀명입니다");
+        }else {
+            resultDto.setSuccess(true);
+            resultDto.setMsg("사용 가능한 팀명입니다.");
+        }
+        return resultDto;
+    }
+
+
+    @Override
     public ResultDto updateTeam(Long teamId, HttpServletRequest servletRequest, TeamRequestDto teamRequestDto) {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
