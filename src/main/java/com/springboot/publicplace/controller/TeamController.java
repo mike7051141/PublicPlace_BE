@@ -27,6 +27,12 @@ public class TeamController {
         return ResponseEntity.status(HttpStatus.OK).body(resultDto);
     }
 
+    @GetMapping("/checkTeamName/{teamName}")
+    public ResponseEntity<ResultDto> checkTeamName(@PathVariable String teamName){
+        ResultDto resultDto = teamService.checkTeamName(teamName);
+        return ResponseEntity.status(HttpStatus.OK).body(resultDto);
+    }
+
     @PutMapping("/updateTeam")
     public ResponseEntity<ResultDto> updateTeam(@RequestParam Long teamId,
                                                 HttpServletRequest servletRequest,
