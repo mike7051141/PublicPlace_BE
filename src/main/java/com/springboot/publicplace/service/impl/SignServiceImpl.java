@@ -7,11 +7,15 @@ import com.springboot.publicplace.dto.SignDto.SignInResultDto;
 import com.springboot.publicplace.dto.SignDto.SignUpDto;
 import com.springboot.publicplace.dto.SignDto.SignUpResultDto;
 import com.springboot.publicplace.entity.User;
+import com.springboot.publicplace.exception.DuplicateResourceException;
+import com.springboot.publicplace.exception.InvalidCredentialsException;
+import com.springboot.publicplace.exception.ResourceNotFoundException;
 import com.springboot.publicplace.repository.UserRepository;
 import com.springboot.publicplace.service.SignService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -84,10 +88,13 @@ public class SignServiceImpl implements SignService {
     public SignInResultDto SignIn(String email, String password) throws RuntimeException {
         logger.info("[getSignInResult] signDataHandler로 회원정보 요청");
         User user = userRepository.findByEmail(email);
-        logger.info("[getSignInResult] EMAIL:{}", email);
+
+        if (user == null) {
+            throw new ResourceNotFoundException("User not found with email: " + email);
+        }
 
         if(!passwordEncoder.matches(password, user.getPassword())){
-            throw new RuntimeException();
+            throw new InvalidCredentialsException("Invalid password for email: " + email);
         }
         logger.info("[getSignInResult] 패스워드 일치");
 
@@ -103,41 +110,38 @@ public class SignServiceImpl implements SignService {
 
     @Override
     public ResultDto checkEmail(String email) {
-        ResultDto resultDto = new ResultDto();
         if (userRepository.existsByEmail(email)) {
-            resultDto.setSuccess(false);
-            resultDto.setMsg("이미 존재하는 이메일입니다");
-        }else {
-            resultDto.setSuccess(true);
-            resultDto.setMsg("사용 가능한 이메일입니다.");
+            throw new DuplicateResourceException("이미 존재하는 이메일입니다.");
         }
-        return resultDto;
+        return ResultDto.builder()
+                .success(true)
+                .msg("사용 가능한 이메일입니다.")
+                .code(HttpStatus.OK.value())
+                .build();
     }
 
     @Override
-    public ResultDto checkPhoneNum (String phoneNum) {
-        ResultDto resultDto = new ResultDto();
+    public ResultDto checkPhoneNum(String phoneNum) {
         if (userRepository.existsByPhoneNumber(phoneNum)) {
-            resultDto.setSuccess(false);
-            resultDto.setMsg("이미 존재하는 전화번호입니다");
-        }else {
-            resultDto.setSuccess(true);
-            resultDto.setMsg("사용 가능한 전화번호입니다.");
+            throw new DuplicateResourceException("이미 존재하는 전화번호입니다.");
         }
-        return resultDto;
+        return ResultDto.builder()
+                .success(true)
+                .msg("사용 가능한 전화번호입니다.")
+                .code(HttpStatus.OK.value())
+                .build();
     }
 
     @Override
     public ResultDto checkNickname(String nickname) {
-        ResultDto resultDto = new ResultDto();
         if (userRepository.existsByNickname(nickname)) {
-            resultDto.setSuccess(false);
-            resultDto.setMsg("이미 존재하는 닉네임입니다");
-        }else {
-            resultDto.setSuccess(true);
-            resultDto.setMsg("사용 가능한 닉네임입니다.");
+            throw new DuplicateResourceException("이미 존재하는 닉네임입니다.");
         }
-        return resultDto;
+        return ResultDto.builder()
+                .success(true)
+                .msg("사용 가능한 닉네임입니다.")
+                .code(HttpStatus.OK.value())
+                .build();
     }
 
     private void setSuccess(SignUpResultDto result){
@@ -150,6 +154,5 @@ public class SignServiceImpl implements SignService {
         result.setSuccess(false);
         result.setCode(CommonResponse.Fail.getCode());
         result.setMsg(CommonResponse.Fail.getMsg());
-
     }
 }

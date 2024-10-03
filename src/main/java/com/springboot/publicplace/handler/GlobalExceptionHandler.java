@@ -1,9 +1,7 @@
 package com.springboot.publicplace.handler;
 
 import com.springboot.publicplace.dto.ResultDto;
-import com.springboot.publicplace.exception.InvalidTokenException;
-import com.springboot.publicplace.exception.ResourceNotFoundException;
-import com.springboot.publicplace.exception.UnauthorizedActionException;
+import com.springboot.publicplace.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +61,29 @@ public class GlobalExceptionHandler {
                 .code(HttpStatus.FORBIDDEN.value())
                 .build();
         return new ResponseEntity<>(resultDto, HttpStatus.FORBIDDEN);
+    }
+
+    // InvalidCredentialsException 처리
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ResultDto> handleInvalidCredentialsException(InvalidCredentialsException ex) {
+        log.error("Invalid Credentials: {}", ex.getMessage());
+        ResultDto resultDto = ResultDto.builder()
+                .success(false)
+                .msg("Invalid Credentials: " + ex.getMessage())
+                .code(HttpStatus.UNAUTHORIZED.value())
+                .build();
+        return new ResponseEntity<>(resultDto, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ResultDto> handleDuplicateResourceException(DuplicateResourceException ex) {
+        log.error("Duplicate Resource: {}", ex.getMessage());
+        ResultDto resultDto = ResultDto.builder()
+                .success(false)
+                .msg(ex.getMessage())
+                .code(HttpStatus.CONFLICT.value()) // 409 Conflict
+                .build();
+        return new ResponseEntity<>(resultDto, HttpStatus.CONFLICT);
     }
 
     // 유효성 검증 예외 처리 (예: @Valid 어노테이션 사용 시)

@@ -10,11 +10,13 @@ import com.springboot.publicplace.dto.response.TeamResponseDto;
 import com.springboot.publicplace.entity.Team;
 import com.springboot.publicplace.entity.TeamUser;
 import com.springboot.publicplace.entity.User;
+import com.springboot.publicplace.exception.DuplicateResourceException;
 import com.springboot.publicplace.repository.TeamRepository;
 import com.springboot.publicplace.repository.TeamUserRepository;
 import com.springboot.publicplace.repository.UserRepository;
 import com.springboot.publicplace.service.TeamService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,18 +66,16 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public ResultDto checkTeamName (String teamName) {
-        ResultDto resultDto = new ResultDto();
+    public ResultDto checkTeamName(String teamName) {
         if (teamRepository.existsByTeamName(teamName)) {
-            resultDto.setSuccess(false);
-            resultDto.setMsg("이미 존재하는 팀명입니다");
-        }else {
-            resultDto.setSuccess(true);
-            resultDto.setMsg("사용 가능한 팀명입니다.");
+            throw new DuplicateResourceException("이미 존재하는 팀명입니다.");
         }
-        return resultDto;
+        return ResultDto.builder()
+                .success(true)
+                .msg("사용 가능한 팀명입니다.")
+                .code(HttpStatus.OK.value())
+                .build();
     }
-
 
     @Override
     public ResultDto updateTeam(Long teamId, HttpServletRequest servletRequest, TeamRequestDto teamRequestDto) {
