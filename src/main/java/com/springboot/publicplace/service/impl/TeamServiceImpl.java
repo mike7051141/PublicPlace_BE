@@ -1,7 +1,6 @@
 package com.springboot.publicplace.service.impl;
 
 import com.springboot.publicplace.config.security.JwtTokenProvider;
-import com.springboot.publicplace.dto.CommonResponse;
 import com.springboot.publicplace.dto.MemberDto;
 import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
@@ -45,6 +44,8 @@ public class TeamServiceImpl implements TeamService {
         team.setTeamName(teamRequestDto.getTeamName());
         team.setTeamImg(teamRequestDto.getTeamImg());
         team.setTeamLocation(teamRequestDto.getTeamLocation());
+        team.setLatitude(teamRequestDto.getLatitude());
+        team.setLongitude(teamRequestDto.getLongitude());
         team.setTeamInfo(teamRequestDto.getTeamInfo());
         team.setActivityDays(teamRequestDto.getActivityDays());
 
@@ -96,6 +97,8 @@ public class TeamServiceImpl implements TeamService {
         team.setTeamName(teamRequestDto.getTeamName());
         team.setTeamImg(teamRequestDto.getTeamImg());
         team.setTeamLocation(teamRequestDto.getTeamLocation());
+        team.setLatitude(teamRequestDto.getLatitude());
+        team.setLongitude(teamRequestDto.getLongitude());
         team.setTeamInfo(teamRequestDto.getTeamInfo());
         team.setActivityDays(teamRequestDto.getActivityDays());
 
@@ -133,6 +136,8 @@ public class TeamServiceImpl implements TeamService {
                 team.getTeamInfo(),
                 team.getCreatedAt(),
                 team.getTeamLocation(),
+                team.getLatitude(),
+                team.getLongitude(),
                 team.getTeamImg(),
                 team.getActivityDays(),
                 teamMemberCount,
@@ -166,6 +171,8 @@ public class TeamServiceImpl implements TeamService {
                             .teamInfo(team.getTeamInfo())
                             .createdAt(team.getCreatedAt())
                             .teamLocation(team.getTeamLocation())
+                            .latitude(team.getLatitude())
+                            .longitude(team.getLongitude())
                             .teamImg(team.getTeamImg())
                             .activityDays(team.getActivityDays())
                             .teamMemberCount(teamMemberCount)  // 팀원 수 포함
