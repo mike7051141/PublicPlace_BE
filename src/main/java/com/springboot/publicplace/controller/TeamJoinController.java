@@ -28,38 +28,10 @@ public class TeamJoinController {
     }
 
     // 팀 탈퇴 요청 엔드포인트
-    @DeleteMapping("/leave/{teamId}")
+    @DeleteMapping("/leaveTeam/{teamId}")
     public ResponseEntity<ResultDto> leaveTeam(@PathVariable Long teamId,
                                                HttpServletRequest servletRequest) {
         ResultDto result = teamJoinService.leaveTeam(teamId, servletRequest);
-        return ResponseEntity.ok(result);
-    }
-
-    @GetMapping("/joinRequestList/{teamId}")
-    public ResponseEntity<List<TeamJoinResponseDto>> getJoinRequestList(@PathVariable Long teamId,
-                                                                        HttpServletRequest servletRequest) {
-        List<TeamJoinResponseDto> joinRequests = teamJoinService.getJoinRequestList(teamId, servletRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(joinRequests);
-    }
-
-    @GetMapping("/joinRequestDetail/{requestId}")
-    public ResponseEntity<TeamJoinDetailResponseDto> getJoinRequestDetail(@PathVariable Long requestId,
-                                                                          HttpServletRequest servletRequest) {
-        TeamJoinDetailResponseDto detailDto = teamJoinService.getJoinRequestDetail(requestId, servletRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(detailDto);
-    }
-
-    @PostMapping("/joinRequest/{requestId}/approve")
-    public ResponseEntity<ResultDto> approveJoinRequest(@PathVariable Long requestId,
-                                                        HttpServletRequest servletRequest) {
-        ResultDto result = teamJoinService.approveJoinRequest(requestId, servletRequest);
-        return ResponseEntity.ok(result);
-    }
-
-    @PostMapping("/joinRequest/{requestId}/reject")
-    public ResponseEntity<ResultDto> rejectJoinRequest(@PathVariable Long requestId,
-                                                       HttpServletRequest servletRequest) {
-        ResultDto result = teamJoinService.rejectJoinRequest(requestId, servletRequest);
         return ResponseEntity.ok(result);
     }
 
