@@ -3,6 +3,7 @@ package com.springboot.publicplace.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "team_board")
@@ -31,4 +32,11 @@ public class TeamBoard extends BaseEntity {
     private String Image;
 
     private String matchLocation;
+
+    private Long longitude;
+
+    private Long latitude;
+
+    @OneToMany(mappedBy = "teamBoard", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamBoardComment> comments;
 }

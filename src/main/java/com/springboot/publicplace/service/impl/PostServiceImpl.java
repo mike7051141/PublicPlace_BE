@@ -51,11 +51,6 @@ public class PostServiceImpl implements PostService {
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);
 
-        // 토큰 유효성 검증
-        if (!jwtTokenProvider.validationToken(token)) {
-            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
-        }
-
         // Post 객체 생성 및 데이터 설정
         Post post = Post.builder()
                 .user(user)
@@ -84,10 +79,6 @@ public class PostServiceImpl implements PostService {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);;
-
-        if(!jwtTokenProvider.validationToken(token)){
-            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
-        }
 
         // 게시글 조회 또는 예외 던지기
         Post post = postRepository.findById(postId)
@@ -120,10 +111,6 @@ public class PostServiceImpl implements PostService {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);;
-
-        if(!jwtTokenProvider.validationToken(token)){
-            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
-        }
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("해당 게시글을 찾을 수 없습니다."));
@@ -270,10 +257,6 @@ public class PostServiceImpl implements PostService {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);;
-
-        if (!jwtTokenProvider.validationToken(token)) {
-            throw new InvalidTokenException("로그인을 먼저 해주세요.");
-        }
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("해당 게시글을 찾을 수 없습니다."));

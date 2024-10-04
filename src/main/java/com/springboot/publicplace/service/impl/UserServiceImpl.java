@@ -11,12 +11,15 @@ import com.springboot.publicplace.entity.Team;
 import com.springboot.publicplace.entity.TeamJoinRequest;
 import com.springboot.publicplace.entity.TeamUser;
 import com.springboot.publicplace.entity.User;
+import com.springboot.publicplace.exception.InvalidTokenException;
+import com.springboot.publicplace.exception.ResourceNotFoundException;
 import com.springboot.publicplace.repository.TeamJoinRequestRepository;
 import com.springboot.publicplace.repository.TeamRepository;
 import com.springboot.publicplace.repository.TeamUserRepository;
 import com.springboot.publicplace.repository.UserRepository;
 import com.springboot.publicplace.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,24 +43,22 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto getUser(HttpServletRequest servletRequest) {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
+        User user = userRepository.findByEmail(email);
 
         UserResponseDto userResponseDto = new UserResponseDto();
-        if (jwtTokenProvider.validationToken(token)) {
-            User user = userRepository.findByEmail(email);
-            userResponseDto.setUserId(user.getUserId());
-            userResponseDto.setName(user.getName());
-            userResponseDto.setEmail(user.getEmail());
-            userResponseDto.setAgeRange(user.getAgeRange());
-            userResponseDto.setNickname(user.getNickname());
-            userResponseDto.setProfileImg(user.getProfileImg());
-            userResponseDto.setPhoneNumber(user.getPhoneNumber());
-            userResponseDto.setPosition(user.getPosition());
-            userResponseDto.setFoot(user.getFoot());
-            userResponseDto.setLoginApproach(user.getLoginApproach());
-            userResponseDto.setGender(user.getGender());
-            userResponseDto.setCreatedAt(String.valueOf(user.getCreatedAt()));
-            userResponseDto.setUpdatedAt(String.valueOf(user.getUpdatedAt()));
-        }
+        userResponseDto.setUserId(user.getUserId());
+        userResponseDto.setName(user.getName());
+        userResponseDto.setEmail(user.getEmail());
+        userResponseDto.setAgeRange(user.getAgeRange());
+        userResponseDto.setNickname(user.getNickname());
+        userResponseDto.setProfileImg(user.getProfileImg());
+        userResponseDto.setPhoneNumber(user.getPhoneNumber());
+        userResponseDto.setPosition(user.getPosition());
+        userResponseDto.setFoot(user.getFoot());
+        userResponseDto.setLoginApproach(user.getLoginApproach());
+        userResponseDto.setGender(user.getGender());
+        userResponseDto.setCreatedAt(String.valueOf(user.getCreatedAt()));
+        userResponseDto.setUpdatedAt(String.valueOf(user.getUpdatedAt()));
         return userResponseDto;
     }
 
@@ -67,23 +68,26 @@ public class UserServiceImpl implements UserService {
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);
 
-        ResultDto resultDto = new ResultDto();
-        if (jwtTokenProvider.validationToken(token) && user.getLoginApproach().equals("Kakao-Login")) {
-            User kakaoUser = userRepository.findByEmail(email);
-            kakaoUser.setNickname(kakaoUserUpdateDto.getNickname());
-            kakaoUser.setGender(kakaoUserUpdateDto.getGender());
-            kakaoUser.setPhoneNumber(kakaoUserUpdateDto.getPhoneNumber());
-            kakaoUser.setFoot(kakaoUserUpdateDto.getFoot());
-            kakaoUser.setProfileImg(kakaoUserUpdateDto.getProfileImg());
-            kakaoUser.setPosition(kakaoUserUpdateDto.getPosition());
-            kakaoUser.setUpdatedAt(LocalDateTime.now());
-            userRepository.save(user);
-            resultDto.setSuccess(true);
-            resultDto.setMsg("카카오 유저 정보 업데이트를 완료하였습니다.");
-        } else {
-            resultDto.setSuccess(false);
-            resultDto.setMsg("카카오 유저 정보 업데이트를 실패하였습니다.");
+        if (!user.getLoginApproach().equals("Kakao-Login")) {
+            throw new RuntimeException("카카오 유저 정보 업데이트를 실패하였습니다.");
         }
+
+        User kakaoUser = userRepository.findByEmail(email);
+        kakaoUser.setNickname(kakaoUserUpdateDto.getNickname());
+        kakaoUser.setGender(kakaoUserUpdateDto.getGender());
+        kakaoUser.setPhoneNumber(kakaoUserUpdateDto.getPhoneNumber());
+        kakaoUser.setFoot(kakaoUserUpdateDto.getFoot());
+        kakaoUser.setProfileImg(kakaoUserUpdateDto.getProfileImg());
+        kakaoUser.setPosition(kakaoUserUpdateDto.getPosition());
+        kakaoUser.setUpdatedAt(LocalDateTime.now());
+
+        userRepository.save(user);
+
+        ResultDto resultDto = ResultDto.builder()
+                .success(true)
+                .msg("카카오 유저 정보 업데이트를 완료하였습니다.")
+                .code(HttpStatus.OK.value())
+                .build();
         return resultDto;
     }
 
@@ -93,24 +97,27 @@ public class UserServiceImpl implements UserService {
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);
 
-        ResultDto resultDto = new ResultDto();
-        if (jwtTokenProvider.validationToken(token) && user.getLoginApproach().equals("Local-Login")) {
-            User localUser = userRepository.findByEmail(email);
-            localUser.setNickname(localUserUpdateDto.getNickname());
-            localUser.setGender(localUserUpdateDto.getGender());
-            localUser.setPassword(passwordEncoder.encode(localUserUpdateDto.getPassword()));
-            localUser.setPhoneNumber(localUserUpdateDto.getPhoneNumber());
-            localUser.setFoot(localUserUpdateDto.getFoot());
-            localUser.setProfileImg(localUserUpdateDto.getProfileImg());
-            localUser.setPosition(localUserUpdateDto.getPosition());
-            localUser.setUpdatedAt(LocalDateTime.now());
-            userRepository.save(user);
-            resultDto.setSuccess(true);
-            resultDto.setMsg("로컬 유저 정보 업데이트를 완료하였습니다.");
-        }else {
-            resultDto.setSuccess(false);
-            resultDto.setMsg("로컬 유저 정보 업데이트를 실패하였습니다.");
+        if (!user.getLoginApproach().equals("Local-Login")) {
+            throw new RuntimeException("로컬 유저 정보 업데이트를 실패하였습니다.");
         }
+
+        User localUser = userRepository.findByEmail(email);
+        localUser.setNickname(localUserUpdateDto.getNickname());
+        localUser.setGender(localUserUpdateDto.getGender());
+        localUser.setPassword(passwordEncoder.encode(localUserUpdateDto.getPassword()));
+        localUser.setPhoneNumber(localUserUpdateDto.getPhoneNumber());
+        localUser.setFoot(localUserUpdateDto.getFoot());
+        localUser.setProfileImg(localUserUpdateDto.getProfileImg());
+        localUser.setPosition(localUserUpdateDto.getPosition());
+        localUser.setUpdatedAt(LocalDateTime.now());
+
+        userRepository.save(user);
+
+        ResultDto resultDto = ResultDto.builder()
+                .success(true)
+                .msg("로컬 유저 정보 업데이트를 완료하였습니다.")
+                .code(HttpStatus.OK.value())
+                .build();
         return resultDto;
     }
 
@@ -158,33 +165,22 @@ public class UserServiceImpl implements UserService {
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);
 
-        ResultDto resultDto = new ResultDto();
-
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResourceNotFoundException("팀을 찾을 수 없습니다."));
+
         TeamJoinRequest teamJoinRequest = teamJoinRequestRepository.findByTeamAndUser(team, user);
-        if (teamJoinRequest != null) {
-            teamJoinRequestRepository.delete(teamJoinRequest);
-            resultDto.setSuccess(true);
-            resultDto.setMsg("팀 신청이 취소 되었습니다.");
-        }else {
-            resultDto.setSuccess(false);
-            resultDto.setMsg("팀 신청취소 중 오류가 발생하였습니다.");
+
+        if (teamJoinRequest == null) {
+            throw new ResourceNotFoundException("신청서를 찾을 수 없습니다.");
         }
+
+        teamJoinRequestRepository.delete(teamJoinRequest);
+
+        ResultDto resultDto = ResultDto.builder()
+                .success(true)
+                .msg("팀 신청이 취소 되었습니다.")
+                .code(HttpStatus.OK.value())
+                .build();
         return resultDto;
-    }
-
-    private void setSuccess(ResultDto resultDto){
-        resultDto.setSuccess(true);
-        resultDto.setCode(CommonResponse.SUCCESS.getCode());
-
-        resultDto.setMsg(CommonResponse.SUCCESS.getMsg());
-    }
-
-    private void setFail(ResultDto resultDto){
-        resultDto.setSuccess(true);
-        resultDto.setCode(CommonResponse.Fail.getCode());
-
-        resultDto.setMsg(CommonResponse.Fail.getMsg());
     }
 }

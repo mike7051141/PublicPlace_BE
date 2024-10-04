@@ -21,9 +21,10 @@ public class GlobalExceptionHandler {
         log.error("An unexpected error occurred: {}", ex.getMessage(), ex);
         ResultDto resultDto = ResultDto.builder()
                 .success(false)
-                .msg("알 수 없는 오류가 발생했습니다.")
+                .msg("알 수 없는 오류가 발생했습니다: " + ex.getMessage())
                 .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .build();
+
         return new ResponseEntity<>(resultDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -80,10 +81,22 @@ public class GlobalExceptionHandler {
         log.error("Duplicate Resource: {}", ex.getMessage());
         ResultDto resultDto = ResultDto.builder()
                 .success(false)
-                .msg(ex.getMessage())
+                .msg("Duplicate Resource: " + ex.getMessage())
                 .code(HttpStatus.CONFLICT.value()) // 409 Conflict
                 .build();
         return new ResponseEntity<>(resultDto, HttpStatus.CONFLICT);
+    }
+
+    // UserNotInTeamException 처리
+    @ExceptionHandler(UserNotInTeamException.class)
+    public ResponseEntity<ResultDto> handleUserNotInTeamException(UserNotInTeamException ex) {
+        log.error("User Not In Team: {}", ex.getMessage());
+        ResultDto resultDto = ResultDto.builder()
+                .success(false)
+                .msg("User Not In Team: " + ex.getMessage())
+                .code(HttpStatus.FORBIDDEN.value())
+                .build();
+        return new ResponseEntity<>(resultDto, HttpStatus.FORBIDDEN);
     }
 
     // 유효성 검증 예외 처리 (예: @Valid 어노테이션 사용 시)

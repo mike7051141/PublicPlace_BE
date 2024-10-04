@@ -11,6 +11,8 @@ import com.springboot.publicplace.entity.Team;
 import com.springboot.publicplace.entity.TeamUser;
 import com.springboot.publicplace.entity.User;
 import com.springboot.publicplace.exception.DuplicateResourceException;
+import com.springboot.publicplace.exception.ResourceNotFoundException;
+import com.springboot.publicplace.exception.UnauthorizedActionException;
 import com.springboot.publicplace.repository.TeamRepository;
 import com.springboot.publicplace.repository.TeamUserRepository;
 import com.springboot.publicplace.repository.UserRepository;
@@ -39,29 +41,27 @@ public class TeamServiceImpl implements TeamService {
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);
 
+        Team team = new Team();
+        team.setTeamName(teamRequestDto.getTeamName());
+        team.setTeamImg(teamRequestDto.getTeamImg());
+        team.setTeamLocation(teamRequestDto.getTeamLocation());
+        team.setTeamInfo(teamRequestDto.getTeamInfo());
+        team.setActivityDays(teamRequestDto.getActivityDays());
 
-        ResultDto resultDto = new ResultDto();
+        teamRepository.save(team);
+        // 팀 생성한 유저를 회장으로 등록
+        TeamUser teamUser = new TeamUser();
+        teamUser.setTeam(team);
+        teamUser.setUser(user);
+        teamUser.setRole("회장"); // 역할 설정
 
-        if(jwtTokenProvider.validationToken(token)){
-            Team team = new Team();
-            team.setTeamName(teamRequestDto.getTeamName());
-            team.setTeamImg(teamRequestDto.getTeamImg());
-            team.setTeamLocation(teamRequestDto.getTeamLocation());
-            team.setTeamInfo(teamRequestDto.getTeamInfo());
-            team.setActivityDays(teamRequestDto.getActivityDays());
+        teamUserRepository.save(teamUser);
 
-            teamRepository.save(team);
-            // 팀 생성한 유저를 회장으로 등록
-            TeamUser teamUser = new TeamUser();
-            teamUser.setTeam(team);
-            teamUser.setUser(user);
-            teamUser.setRole("회장"); // 역할 설정
-
-            teamUserRepository.save(teamUser);
-            setSuccess(resultDto);
-        }else {
-            setFail(resultDto);
-        }
+        ResultDto resultDto = ResultDto.builder()
+                .success(true)
+                .msg("팀 생성에 성공하였습니다.")
+                .code(HttpStatus.OK.value())
+                .build();
         return resultDto;
     }
 
@@ -83,37 +83,35 @@ public class TeamServiceImpl implements TeamService {
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);
 
-        ResultDto resultDto = new ResultDto();
+        // 팀 정보 가져오기
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new ResourceNotFoundException("팀을 찾을 수 없습니다."));
 
-        if (jwtTokenProvider.validationToken(token)) {
-            // 팀 정보 가져오기
-            Team team = teamRepository.findById(teamId)
-                    .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
-
-            // 회장 여부 확인
-            if (!isTeamLeader(team, user)) {
-                throw new RuntimeException("회장만 이 작업을 수행할 수 있습니다.");
-            }
-
-            // 팀 정보 업데이트
-            team.setTeamName(teamRequestDto.getTeamName());
-            team.setTeamImg(teamRequestDto.getTeamImg());
-            team.setTeamLocation(teamRequestDto.getTeamLocation());
-            team.setTeamInfo(teamRequestDto.getTeamInfo());
-            team.setActivityDays(teamRequestDto.getActivityDays());
-
-            teamRepository.save(team);
-            setSuccess(resultDto);
-        } else {
-            setFail(resultDto);
+        // 회장 여부 확인
+        if (!isTeamLeader(team, user)) {
+            throw new UnauthorizedActionException("회장만 이 작업을 수행할 수 있습니다.");
         }
+
+        // 팀 정보 업데이트
+        team.setTeamName(teamRequestDto.getTeamName());
+        team.setTeamImg(teamRequestDto.getTeamImg());
+        team.setTeamLocation(teamRequestDto.getTeamLocation());
+        team.setTeamInfo(teamRequestDto.getTeamInfo());
+        team.setActivityDays(teamRequestDto.getActivityDays());
+
+        teamRepository.save(team);
+        ResultDto resultDto = ResultDto.builder()
+                .success(true)
+                .msg("팀 수정을 완료하였습니다.")
+                .code(HttpStatus.OK.value())
+                .build();
         return resultDto;
     }
 
     @Override
     public TeamResponseDto getTeamInfo(Long teamId) {
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResourceNotFoundException("팀을 찾을 수 없습니다."));
 
         // 팀원 리스트 가져오기
         List<MemberDto> members = team.getTeamUsers().stream()
@@ -222,27 +220,14 @@ public class TeamServiceImpl implements TeamService {
                 .teamImg(team.getTeamImg())
                 .teamMemberCount(team.getTeamMembers()) // 팀 멤버 수
                 .averageAge(team.getAverageAge())       // 평균 나이
-                .build()).collect(Collectors.toList());
-
+                .build())
+                .collect(Collectors.toList());
         return teamList;
     }
 
-
-    private void setSuccess(ResultDto resultDto){
-        resultDto.setSuccess(true);
-        resultDto.setCode(CommonResponse.SUCCESS.getCode());
-
-        resultDto.setMsg(CommonResponse.SUCCESS.getMsg());
-    }
-
-    private void setFail(ResultDto resultDto){
-        resultDto.setSuccess(true);
-        resultDto.setCode(CommonResponse.Fail.getCode());
-
-        resultDto.setMsg(CommonResponse.Fail.getMsg());
-    }
     public boolean isTeamLeader(Team team, User user) {
-        TeamUser teamUser = teamUserRepository.findByTeamAndUser(team,user);
+        TeamUser teamUser = teamUserRepository.findByTeamAndUser(team,user)
+                .orElseThrow(() -> new UnauthorizedActionException("팀에 가입된 사용자가 아닙니다."));
         return teamUser != null && "회장".equals(teamUser.getRole());
     }
 }
