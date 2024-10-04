@@ -52,20 +52,20 @@ public class SignController {
         throw new RuntimeException("접근이 금지 되었습니다.");
     }
 
-    @ExceptionHandler(value = RuntimeException.class)
-    public ResponseEntity<Map<String, String>> ExceptionHandler(RuntimeException e) {
-        HttpHeaders responseHeaders = new HttpHeaders();
-        //responseHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json");
-        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-
-        logger.error("ExceptionHandler 호출, {}, {}", e.getCause(), e.getMessage());
-
-        Map<String, String> map = new HashMap<>();
-        map.put("error type", httpStatus.getReasonPhrase());
-        map.put("code", "400");
-        map.put("message", "에러 발생");
-
-        return new ResponseEntity<>(map, responseHeaders, httpStatus);
-    }
+//    @ExceptionHandler(value = RuntimeException.class)
+//    public ResponseEntity<Map<String, String>> ExceptionHandler(RuntimeException e) {
+//        HttpHeaders responseHeaders = new HttpHeaders();
+//        //responseHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json");
+//        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+//
+//        logger.error("ExceptionHandler 호출, {}, {}", e.getCause(), e.getMessage());
+//
+//        Map<String, String> map = new HashMap<>();
+//        map.put("error type", httpStatus.getReasonPhrase());
+//        map.put("code", "400");
+//        map.put("message", "에러 발생");
+//
+//        return new ResponseEntity<>(map, responseHeaders, httpStatus);
+//    }
 
 }

@@ -11,4 +11,6 @@ public class TeamBoardRequestDto {
     private String content;
     private String Image;
     private String matchLocation;
+    private Long longitude;
+    private Long latitude;
 }

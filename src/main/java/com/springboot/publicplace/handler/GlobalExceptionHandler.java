@@ -1,9 +1,7 @@
 package com.springboot.publicplace.handler;
 
 import com.springboot.publicplace.dto.ResultDto;
-import com.springboot.publicplace.exception.InvalidTokenException;
-import com.springboot.publicplace.exception.ResourceNotFoundException;
-import com.springboot.publicplace.exception.UnauthorizedActionException;
+import com.springboot.publicplace.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +21,10 @@ public class GlobalExceptionHandler {
         log.error("An unexpected error occurred: {}", ex.getMessage(), ex);
         ResultDto resultDto = ResultDto.builder()
                 .success(false)
-                .msg("알 수 없는 오류가 발생했습니다.")
+                .msg("알 수 없는 오류가 발생했습니다: " + ex.getMessage())
                 .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .build();
+
         return new ResponseEntity<>(resultDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -60,6 +59,41 @@ public class GlobalExceptionHandler {
         ResultDto resultDto = ResultDto.builder()
                 .success(false)
                 .msg("Unauthorized Action: " + ex.getMessage())
+                .code(HttpStatus.FORBIDDEN.value())
+                .build();
+        return new ResponseEntity<>(resultDto, HttpStatus.FORBIDDEN);
+    }
+
+    // InvalidCredentialsException 처리
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ResultDto> handleInvalidCredentialsException(InvalidCredentialsException ex) {
+        log.error("Invalid Credentials: {}", ex.getMessage());
+        ResultDto resultDto = ResultDto.builder()
+                .success(false)
+                .msg("Invalid Credentials: " + ex.getMessage())
+                .code(HttpStatus.UNAUTHORIZED.value())
+                .build();
+        return new ResponseEntity<>(resultDto, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ResultDto> handleDuplicateResourceException(DuplicateResourceException ex) {
+        log.error("Duplicate Resource: {}", ex.getMessage());
+        ResultDto resultDto = ResultDto.builder()
+                .success(false)
+                .msg("Duplicate Resource: " + ex.getMessage())
+                .code(HttpStatus.CONFLICT.value()) // 409 Conflict
+                .build();
+        return new ResponseEntity<>(resultDto, HttpStatus.CONFLICT);
+    }
+
+    // UserNotInTeamException 처리
+    @ExceptionHandler(UserNotInTeamException.class)
+    public ResponseEntity<ResultDto> handleUserNotInTeamException(UserNotInTeamException ex) {
+        log.error("User Not In Team: {}", ex.getMessage());
+        ResultDto resultDto = ResultDto.builder()
+                .success(false)
+                .msg("User Not In Team: " + ex.getMessage())
                 .code(HttpStatus.FORBIDDEN.value())
                 .build();
         return new ResponseEntity<>(resultDto, HttpStatus.FORBIDDEN);
