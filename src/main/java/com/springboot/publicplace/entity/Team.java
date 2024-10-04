@@ -27,6 +27,10 @@ public class Team extends BaseEntity{
 
     private String teamLocation;
 
+    private Double latitude;
+
+    private Double longitude;
+
     private String teamImg;
 
     @ElementCollection
@@ -66,7 +70,4 @@ public class Team extends BaseEntity{
                 .average()
                 .orElse(0); // 평균을 계산, 팀원이 없으면 0 반환
     }
-
-
-
 }

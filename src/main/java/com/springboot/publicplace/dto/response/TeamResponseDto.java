@@ -17,9 +17,10 @@ public class TeamResponseDto {
     private Long teamId;
     private String teamName;
     private String teamInfo;
-
     private LocalDateTime createdAt;
     private String teamLocation;
+    private Double latitude;
+    private Double longitude;
     private String teamImg;
     private List<String> activityDays;
     private Long teamMemberCount;
