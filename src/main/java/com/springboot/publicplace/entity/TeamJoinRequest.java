@@ -28,7 +28,7 @@ public class TeamJoinRequest {
 
     private String status;
 
-    private String role;
+    private RoleType role;
 
     private LocalDateTime requestDate;
 
