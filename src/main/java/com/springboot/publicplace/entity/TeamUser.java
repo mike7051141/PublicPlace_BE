@@ -25,6 +25,7 @@ public class TeamUser {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private RoleType role;
 
 }

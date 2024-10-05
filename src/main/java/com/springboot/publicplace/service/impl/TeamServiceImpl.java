@@ -6,6 +6,7 @@ import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
 import com.springboot.publicplace.dto.response.TeamListResponseDto;
 import com.springboot.publicplace.dto.response.TeamResponseDto;
+import com.springboot.publicplace.entity.RoleType;
 import com.springboot.publicplace.entity.Team;
 import com.springboot.publicplace.entity.TeamUser;
 import com.springboot.publicplace.entity.User;
@@ -54,7 +55,7 @@ public class TeamServiceImpl implements TeamService {
         TeamUser teamUser = new TeamUser();
         teamUser.setTeam(team);
         teamUser.setUser(user);
-        teamUser.setRole("회장"); // 역할 설정
+        teamUser.setRole(RoleType.회장); // 역할 설정
 
         teamUserRepository.save(teamUser);
 
