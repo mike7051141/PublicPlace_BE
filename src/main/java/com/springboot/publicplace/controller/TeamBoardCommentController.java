@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/team-board/comment")
+@RequestMapping("/api/v1/team-board/comment")
 @RequiredArgsConstructor
 public class TeamBoardCommentController {
     private final TeamBoardCommentService teamBoardCommentService;
