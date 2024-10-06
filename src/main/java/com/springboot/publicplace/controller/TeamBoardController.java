@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
-@RequestMapping("/team-board")
+@RequestMapping("/api/v1/team-board")
 @RequiredArgsConstructor
 public class TeamBoardController {
 
