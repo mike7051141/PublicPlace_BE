@@ -6,13 +6,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class SignInResultDto extends SignUpResultDto{
-
+@Builder
+public class SignInResultDto{
+    private boolean success;
+    private int code;
+    private String msg;
     private String token;
-
-    @Builder
-    public SignInResultDto(boolean success, int code, String msg, String token) {
-        super(success, code, msg);
-        this.token = token;
-    }
 }
