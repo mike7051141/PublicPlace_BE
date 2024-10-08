@@ -1,14 +1,10 @@
 package com.springboot.publicplace.service.impl;
 
 import com.springboot.publicplace.config.security.JwtTokenProvider;
-import com.springboot.publicplace.dto.CommonResponse;
 import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.response.TeamJoinDetailResponseDto;
 import com.springboot.publicplace.dto.response.TeamJoinResponseDto;
-import com.springboot.publicplace.entity.Team;
-import com.springboot.publicplace.entity.TeamJoinRequest;
-import com.springboot.publicplace.entity.TeamUser;
-import com.springboot.publicplace.entity.User;
+import com.springboot.publicplace.entity.*;
 import com.springboot.publicplace.exception.ResourceNotFoundException;
 import com.springboot.publicplace.exception.UnauthorizedActionException;
 import com.springboot.publicplace.exception.UserNotInTeamException;
@@ -48,7 +44,7 @@ public class TeamJoinAdminServiceImpl implements TeamJoinAdminService {
             throw new UnauthorizedActionException("회장만 이 작업을 수행할 수 있습니다.");
         }
 
-        List<TeamJoinRequest> requests = teamJoinRequestRepository.findAllByTeamAndStatus(team, "PENDING");
+        List<TeamJoinRequest> requests = teamJoinRequestRepository.findAllByTeamAndStatus(team, Status.PENDING);
 
         return requests.stream()
                 .map(request -> new TeamJoinResponseDto(
@@ -82,18 +78,18 @@ public class TeamJoinAdminServiceImpl implements TeamJoinAdminService {
                 request.getUserPhoneNumber(),
                 request.getJoinReason(),
                 request.getStatus(),
-                request.getRole(),
-                request.getRequestDate()
+                request.getRole()
         );
         return detailDto;
     }
 
     @Override
-    public ResultDto approveJoinRequest(Long requestId, HttpServletRequest servletRequest) {
+    public ResultDto processJoinRequest(Long requestId, HttpServletRequest servletRequest, boolean accept) {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);
 
+        ResultDto resultDto;
         TeamJoinRequest request = teamJoinRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ResourceNotFoundException("신청서를 찾을 수 없습니다."));
 
@@ -102,56 +98,39 @@ public class TeamJoinAdminServiceImpl implements TeamJoinAdminService {
         if (!isTeamLeader(team, user)) {
             throw new UnauthorizedActionException("회장만 이 작업을 수행할 수 있습니다.");
         }
+        if (accept) {
+            // 팀원으로 추가
+            TeamUser teamUser = new TeamUser();
+            teamUser.setTeam(request.getTeam());
+            teamUser.setUser(request.getUser());
+            teamUser.setRole(request.getRole());
 
-        // 팀원으로 추가
-        TeamUser teamUser = new TeamUser();
-        teamUser.setTeam(request.getTeam());
-        teamUser.setUser(request.getUser());
-        teamUser.setRole(request.getRole());
+            // 가입상태 대기 --> 승인
+            request.setStatus(Status.ACCEPT);
 
-        // 팀원 저장
-        teamUserRepository.save(teamUser);
-
-        // 가입 요청 삭제
-        teamJoinRequestRepository.delete(request);
-
-        ResultDto resultDto = ResultDto.builder()
-                .success(true)
-                .msg("팀 가입 요청을 승인하였습니다.")
-                .code(HttpStatus.OK.value())
-                .build();
-        return resultDto;
-    }
-
-    @Override
-    public ResultDto rejectJoinRequest(Long requestId, HttpServletRequest servletRequest) {
-        String token = jwtTokenProvider.resolveToken(servletRequest);
-        String email = jwtTokenProvider.getUsername(token);
-        User user = userRepository.findByEmail(email);
-
-        TeamJoinRequest request = teamJoinRequestRepository.findById(requestId)
-                .orElseThrow(() -> new ResourceNotFoundException("신청서를 찾을 수 없습니다."));
-
-        Team team = request.getTeam();
-        // 회장 여부 확인
-        if (!isTeamLeader(team, user)) {
-            throw new UnauthorizedActionException("회장만 이 작업을 수행할 수 있습니다.");
+            // 팀원 저장
+            teamUserRepository.save(teamUser);
+            resultDto = ResultDto.builder()
+                    .success(true)
+                    .msg("팀 가입 요청을 승인하였습니다.")
+                    .code(HttpStatus.OK.value())
+                    .build();
+        } else {
+            // 가입상태 대기 --> 거절
+            request.setStatus(Status.REJECT);
+            resultDto = ResultDto.builder()
+                    .success(false)
+                    .msg("팀 가입 요청을 거절하였습니다.")
+                    .code(HttpStatus.OK.value())
+                    .build();
         }
-
-        // 가입 요청 삭제
-        teamJoinRequestRepository.delete(request);
-
-        ResultDto resultDto = ResultDto.builder()
-                .success(true)
-                .msg("팀 가입 요청을 거절하였습니다.")
-                .code(HttpStatus.OK.value())
-                .build();
+        teamJoinRequestRepository.save(request);
         return resultDto;
     }
 
     public boolean isTeamLeader(Team team, User user) {
         TeamUser teamUser = teamUserRepository.findByTeamAndUser(team,user)
                 .orElseThrow(() -> new UserNotInTeamException("팀에 가입된 사용자가 아닙니다."));
-        return teamUser != null && "회장".equals(teamUser.getRole());
+        return teamUser != null && RoleType.회장.equals(teamUser.getRole());
     }
 }

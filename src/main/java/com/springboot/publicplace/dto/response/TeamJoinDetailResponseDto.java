@@ -1,6 +1,7 @@
 package com.springboot.publicplace.dto.response;
 
 import com.springboot.publicplace.entity.RoleType;
+import com.springboot.publicplace.entity.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,6 @@ public class TeamJoinDetailResponseDto {
     private String userAgeRange;
     private String userPhoneNumber;
     private String joinReason;
-    private String status;
+    private Status status;
     private RoleType role;
-    private LocalDateTime requestDate;
 }

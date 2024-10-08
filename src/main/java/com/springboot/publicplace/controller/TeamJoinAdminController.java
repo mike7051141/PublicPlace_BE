@@ -36,14 +36,14 @@ public class TeamJoinAdminController {
     @PostMapping("/{requestId}/approve")
     public ResponseEntity<ResultDto> approveJoinRequest(@PathVariable Long requestId,
                                                         HttpServletRequest servletRequest) {
-        ResultDto result = teamJoinAdminService.approveJoinRequest(requestId, servletRequest);
-        return ResponseEntity.ok(result);
+        ResultDto result = teamJoinAdminService.processJoinRequest(requestId, servletRequest,true);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @PostMapping("/{requestId}/reject")
     public ResponseEntity<ResultDto> rejectJoinRequest(@PathVariable Long requestId,
                                                        HttpServletRequest servletRequest) {
-        ResultDto result = teamJoinAdminService.rejectJoinRequest(requestId, servletRequest);
-        return ResponseEntity.ok(result);
+        ResultDto result = teamJoinAdminService.processJoinRequest(requestId, servletRequest,false);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 }
