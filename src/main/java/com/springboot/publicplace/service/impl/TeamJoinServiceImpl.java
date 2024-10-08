@@ -1,29 +1,21 @@
 package com.springboot.publicplace.service.impl;
 
 import com.springboot.publicplace.config.security.JwtTokenProvider;
-import com.springboot.publicplace.dto.CommonResponse;
 import com.springboot.publicplace.dto.ResultDto;
-import com.springboot.publicplace.dto.response.TeamJoinDetailResponseDto;
-import com.springboot.publicplace.dto.response.TeamJoinResponseDto;
 import com.springboot.publicplace.entity.*;
 import com.springboot.publicplace.exception.DuplicateResourceException;
 import com.springboot.publicplace.exception.ResourceNotFoundException;
-import com.springboot.publicplace.exception.UnauthorizedActionException;
 import com.springboot.publicplace.exception.UserNotInTeamException;
 import com.springboot.publicplace.repository.TeamJoinRequestRepository;
 import com.springboot.publicplace.repository.TeamRepository;
 import com.springboot.publicplace.repository.TeamUserRepository;
 import com.springboot.publicplace.repository.UserRepository;
 import com.springboot.publicplace.service.TeamJoinService;
-import javassist.bytecode.DuplicateMemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +43,7 @@ public class TeamJoinServiceImpl implements TeamJoinService {
         }
 
         // 이미 가입 신청서를 제출했는지 확인
-        boolean alreadyRequested = teamJoinRequestRepository.existsByTeamAndUserAndStatus(team, user, "PENDING");
+        boolean alreadyRequested = teamJoinRequestRepository.existsByTeamAndUserAndStatus(team, user, Status.PENDING);
         if (alreadyRequested) {
             throw new DuplicateResourceException("이미 팀에 가입 신청을 한 상태입니다.");
         }
@@ -61,8 +53,7 @@ public class TeamJoinServiceImpl implements TeamJoinService {
         joinRequest.setTeam(team);
         joinRequest.setUser(user);
         joinRequest.setRole(RoleType.팀원);
-        joinRequest.setStatus("PENDING");
-        joinRequest.setRequestDate(LocalDateTime.now());
+        joinRequest.setStatus(Status.PENDING);
         joinRequest.setUserName(user.getName());
         joinRequest.setUserGender(user.getGender());
         joinRequest.setUserAgeRange(user.getAgeRange());

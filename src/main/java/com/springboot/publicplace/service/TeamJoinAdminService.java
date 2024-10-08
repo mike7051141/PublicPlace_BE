@@ -12,7 +12,5 @@ public interface TeamJoinAdminService {
 
     TeamJoinDetailResponseDto getJoinRequestDetail(Long requestId, HttpServletRequest servletRequest);
 
-    ResultDto approveJoinRequest(Long requestId, HttpServletRequest servletRequest);
-
-    ResultDto rejectJoinRequest(Long requestId, HttpServletRequest servletRequest);
+    ResultDto processJoinRequest(Long requestId, HttpServletRequest servletRequest, boolean accept);
 }

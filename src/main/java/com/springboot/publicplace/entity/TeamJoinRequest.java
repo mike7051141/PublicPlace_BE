@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @ToString
 @Entity
 @Table(name = "team_join_request")
-public class TeamJoinRequest {
+public class TeamJoinRequest extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,13 +26,11 @@ public class TeamJoinRequest {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String status;
-
+    @Enumerated(EnumType.STRING)  // RoleType이 문자열로 저장됨
     private RoleType role;
 
-    private LocalDateTime requestDate;
-
-    private LocalDateTime processDate;
+    @Enumerated(EnumType.STRING)  // Status가 문자열로 저장됨
+    private Status status;
 
     private String userName;
     private String userGender;
