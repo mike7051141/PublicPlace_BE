@@ -41,6 +41,10 @@ public class TeamServiceImpl implements TeamService {
         String email = jwtTokenProvider.getUsername(token);
         User user = userRepository.findByEmail(email);
 
+        if(teamRepository.existsByTeamName(teamRequestDto.getTeamName())){
+            throw new DuplicateResourceException("팀이름이 중복되었습니다.");
+        }
+
         Team team = new Team();
         team.setTeamName(teamRequestDto.getTeamName());
         team.setTeamImg(teamRequestDto.getTeamImg());
