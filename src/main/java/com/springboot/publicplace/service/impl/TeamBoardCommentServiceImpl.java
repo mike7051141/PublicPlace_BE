@@ -6,7 +6,6 @@ import com.springboot.publicplace.dto.request.TeamBoardCommentRequestDto;
 import com.springboot.publicplace.entity.TeamBoard;
 import com.springboot.publicplace.entity.TeamBoardComment;
 import com.springboot.publicplace.entity.User;
-import com.springboot.publicplace.exception.InvalidTokenException;
 import com.springboot.publicplace.exception.ResourceNotFoundException;
 import com.springboot.publicplace.exception.UnauthorizedActionException;
 import com.springboot.publicplace.repository.TeamBoardCommentRepository;
