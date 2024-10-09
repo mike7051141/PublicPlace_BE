@@ -12,8 +12,10 @@ import java.time.LocalDateTime;
 public class TeamBoardListResponseDto {
     private Long teamBoardId;
     private String content;
+    private int commentCount;
     private String Image;
     private String userName;
+    private String userProfileImage;
     private String matchLocation;
     private Long latitude;
     private Long longitude;
