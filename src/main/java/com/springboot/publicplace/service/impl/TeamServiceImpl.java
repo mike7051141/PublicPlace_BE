@@ -4,6 +4,7 @@ import com.springboot.publicplace.config.security.JwtTokenProvider;
 import com.springboot.publicplace.dto.MemberDto;
 import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
+import com.springboot.publicplace.dto.response.GPTTeamListDto;
 import com.springboot.publicplace.dto.response.TeamListResponseDto;
 import com.springboot.publicplace.dto.response.TeamResponseDto;
 import com.springboot.publicplace.dto.response.TeamRoleResponseDto;
@@ -176,41 +177,30 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<TeamResponseDto> getTeamList(HttpServletRequest servletRequest) {
+    public List<GPTTeamListDto> getTeamList(HttpServletRequest servletRequest) {
+        // 모든 팀을 가져옴
         List<Team> teams = teamRepository.findAll();
+
         return teams.stream()
                 .map(team -> {
-                    // 팀원 리스트 생성
-                    List<MemberDto> members = team.getTeamUsers().stream()
-                            .map(teamUser -> new MemberDto(
-                                    teamUser.getUser().getName(),
-                                    teamUser.getUser().getNickname(),
-                                    teamUser.getUser().getPosition(),
-                                    teamUser.getRole(),
-                                    teamUser.getUser().getAgeRange()
-                            ))
-                            .collect(Collectors.toList());
-
                     // 팀원 수 계산
-                    Long teamMemberCount = (long) members.size();
+                    Long teamMemberCount = (long) team.getTeamUsers().size();
 
-                    // TeamResponseDto 생성 및 반환
-                    return TeamResponseDto.builder()
-                            .teamId(team.getTeamId())
-                            .teamName(team.getTeamName())
-                            .teamInfo(team.getTeamInfo())
-                            .createdAt(team.getCreatedAt())
-                            .teamLocation(team.getTeamLocation())
-                            .latitude(team.getLatitude())
-                            .longitude(team.getLongitude())
-                            .teamImg(team.getTeamImg())
-                            .activityDays(team.getActivityDays())
-                            .teamMemberCount(teamMemberCount)  // 팀원 수 포함
-                            .members(members)  // 팀원 리스트 포함
+                    double averageAge = team.getAverageAge();
+                    // GPTTeamListDto 생성 및 반환
+                    return GPTTeamListDto.builder()
+                            .teamName(team.getTeamName())            // 팀 이름
+                            .teamInfo(team.getTeamInfo())            // 팀 정보
+                            .createdAt(team.getCreatedAt())          // 생성일
+                            .teamLocation(team.getTeamLocation())    // 팀 위치
+                            .activityDays(team.getActivityDays())    // 활동일
+                            .teamMemberCount(teamMemberCount)         // 팀원 수
+                            .averageAge(averageAge)                         // 평균 나이 필드는 null로 설정 (추후 필요시 계산 추가)
                             .build();
                 })
                 .collect(Collectors.toList());
     }
+
 
     public List<TeamListResponseDto> getTeamsByCriteria(String sortBy, String teamName) {
         List<Team> teams;

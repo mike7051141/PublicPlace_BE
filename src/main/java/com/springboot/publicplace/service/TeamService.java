@@ -2,6 +2,7 @@ package com.springboot.publicplace.service;
 
 import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
+import com.springboot.publicplace.dto.response.GPTTeamListDto;
 import com.springboot.publicplace.dto.response.TeamListResponseDto;
 import com.springboot.publicplace.dto.response.TeamResponseDto;
 import com.springboot.publicplace.dto.response.TeamRoleResponseDto;
@@ -16,7 +17,7 @@ public interface TeamService{
 
     TeamResponseDto getTeamInfo(Long teamId);
 
-    List<TeamResponseDto> getTeamList(HttpServletRequest servletRequest);
+    List<GPTTeamListDto> getTeamList(HttpServletRequest servletRequest);
 
     List<TeamListResponseDto> getTeamsByCriteria(String sortBy, String teamName);
 

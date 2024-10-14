@@ -2,6 +2,7 @@ package com.springboot.publicplace.controller;
 
 import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
+import com.springboot.publicplace.dto.response.GPTTeamListDto;
 import com.springboot.publicplace.dto.response.TeamListResponseDto;
 import com.springboot.publicplace.dto.response.TeamResponseDto;
 import com.springboot.publicplace.dto.response.TeamRoleResponseDto;
@@ -49,8 +50,8 @@ public class TeamController {
     }
 
     @GetMapping("/getTeamList")
-    public ResponseEntity<List<TeamResponseDto>> getTeamList(HttpServletRequest servletRequest) {
-        List<TeamResponseDto> teamList = teamService.getTeamList(servletRequest);
+    public ResponseEntity<List<GPTTeamListDto>> getTeamList(HttpServletRequest servletRequest) {
+        List<GPTTeamListDto> teamList = teamService.getTeamList(servletRequest);
         return ResponseEntity.status(HttpStatus.OK).body(teamList);
     }
 
