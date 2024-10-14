@@ -4,6 +4,7 @@ import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
 import com.springboot.publicplace.dto.response.TeamListResponseDto;
 import com.springboot.publicplace.dto.response.TeamResponseDto;
+import com.springboot.publicplace.dto.response.TeamRoleResponseDto;
 import com.springboot.publicplace.service.TeamService;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -61,5 +62,12 @@ public class TeamController {
 
         List<TeamListResponseDto> teams = teamService.getTeamsByCriteria(sortBy, teamName);
         return ResponseEntity.status(HttpStatus.OK).body(teams);
+    }
+
+    @PostMapping("/leader/{teamId}")
+    public ResponseEntity<TeamRoleResponseDto> checkTeamRole(HttpServletRequest servletRequest,
+                                                             @PathVariable Long teamId) {
+        TeamRoleResponseDto teamRoleResponseDto = teamService.checkTeamRole(servletRequest,teamId);
+        return ResponseEntity.status(HttpStatus.OK).body(teamRoleResponseDto);
     }
 }

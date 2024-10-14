@@ -6,6 +6,7 @@ import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
 import com.springboot.publicplace.dto.response.TeamListResponseDto;
 import com.springboot.publicplace.dto.response.TeamResponseDto;
+import com.springboot.publicplace.dto.response.TeamRoleResponseDto;
 import com.springboot.publicplace.entity.RoleType;
 import com.springboot.publicplace.entity.Team;
 import com.springboot.publicplace.entity.TeamUser;
@@ -13,6 +14,7 @@ import com.springboot.publicplace.entity.User;
 import com.springboot.publicplace.exception.DuplicateResourceException;
 import com.springboot.publicplace.exception.ResourceNotFoundException;
 import com.springboot.publicplace.exception.UnauthorizedActionException;
+import com.springboot.publicplace.exception.UserNotInTeamException;
 import com.springboot.publicplace.repository.TeamRepository;
 import com.springboot.publicplace.repository.TeamUserRepository;
 import com.springboot.publicplace.repository.UserRepository;
@@ -81,6 +83,29 @@ public class TeamServiceImpl implements TeamService {
                 .msg("사용 가능한 팀명입니다.")
                 .code(HttpStatus.OK.value())
                 .build();
+    }
+
+    @Override
+    public TeamRoleResponseDto checkTeamRole(HttpServletRequest servletRequest, Long teamId) {
+        String token = jwtTokenProvider.resolveToken(servletRequest);
+        String email = jwtTokenProvider.getUsername(token);
+        User user = userRepository.findByEmail(email);
+
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new ResourceNotFoundException("팀을 찾을 수 없습니다."));
+
+        TeamUser teamUser = teamUserRepository.findByTeamAndUser(team, user)
+                .orElseThrow(() -> new UserNotInTeamException("팀에 가입된 사용자가 아닙니다."));
+
+        TeamRoleResponseDto teamRoleResponseDto = new TeamRoleResponseDto();
+        if (teamUser.getRole().equals(RoleType.회장)) {
+            teamRoleResponseDto.setRole(RoleType.회장);
+            teamRoleResponseDto.setLeader(true);
+        } else if (teamUser.getRole().equals(RoleType.팀원)) {
+            teamRoleResponseDto.setRole(RoleType.팀원);
+            teamRoleResponseDto.setLeader(false);
+        }
+        return teamRoleResponseDto;
     }
 
     @Override
