@@ -55,4 +55,4 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/publicplace_be:latest
             docker stop publicplace_be || true
             docker rm publicplace_be || true
-            docker run -d --name publicplace_be -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/publiceplace_be:latest
+            docker run -d --name publicplace_be -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/publicplace_be:latest
