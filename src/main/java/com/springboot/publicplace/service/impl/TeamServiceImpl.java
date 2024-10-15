@@ -176,6 +176,43 @@ public class TeamServiceImpl implements TeamService {
         );
     }
 
+//    @Override
+//    public List<TeamResponseDto> getRandomTeamList(HttpServletRequest servletRequest) {
+//        List<Team> teams = teamRepository.findAll();
+//        return teams.stream()
+//                .map(team -> {
+//                    // 팀원 리스트 생성
+//                    List<MemberDto> members = team.getTeamUsers().stream()
+//                            .map(teamUser -> new MemberDto(
+//                                    teamUser.getUser().getName(),
+//                                    teamUser.getUser().getNickname(),
+//                                    teamUser.getUser().getPosition(),
+//                                    teamUser.getRole(),
+//                                    teamUser.getUser().getAgeRange()
+//                            ))
+//                            .collect(Collectors.toList());
+//
+//                    // 팀원 수 계산
+//                    Long teamMemberCount = (long) members.size();
+//
+//                    // TeamResponseDto 생성 및 반환
+//                    return TeamResponseDto.builder()
+//                            .teamId(team.getTeamId())
+//                            .teamName(team.getTeamName())
+//                            .teamInfo(team.getTeamInfo())
+//                            .createdAt(team.getCreatedAt())
+//                            .teamLocation(team.getTeamLocation())
+//                            .latitude(team.getLatitude())
+//                            .longitude(team.getLongitude())
+//                            .teamImg(team.getTeamImg())
+//                            .activityDays(team.getActivityDays())
+//                            .teamMemberCount(teamMemberCount)  // 팀원 수 포함
+//                            .members(members)  // 팀원 리스트 포함
+//                            .build();
+//                })
+//                .collect(Collectors.toList());
+//    }
+
     @Override
     public List<GPTTeamListDto> getTeamList(HttpServletRequest servletRequest) {
         // 모든 팀을 가져옴
@@ -199,7 +236,6 @@ public class TeamServiceImpl implements TeamService {
                             .build();
                 })
                 .collect(Collectors.toList());
-
         return teamLists;
     }
 
