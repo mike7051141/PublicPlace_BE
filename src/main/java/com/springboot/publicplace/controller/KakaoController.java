@@ -21,7 +21,7 @@ public class KakaoController {
 
     private final KakaoService kakaoService;
 
-    @Value("${kakao.client.id}")
+    @Value("${KAKAO_CLIENT_ID}")
     private String client_id;
 
     @Value("${kakao.redirect.url}")

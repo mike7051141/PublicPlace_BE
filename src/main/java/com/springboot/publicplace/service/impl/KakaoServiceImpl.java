@@ -27,7 +27,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class KakaoServiceImpl implements KakaoService {
-    @Value("${kakao.client.id}")
+    @Value("${KAKAO_CLIENT_ID}")
     private String clientKey;
     @Value("${kakao.redirect.url}")
     private String redirectUrl;

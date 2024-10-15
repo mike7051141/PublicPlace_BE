@@ -27,6 +27,14 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
+        env:
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}  # GitHub Secrets에서 가져온 사용자명
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}  # GitHub Secrets에서 가져온 비밀번호
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}               # JWT 비밀
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}     # OpenAI API 키
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}     # AWS 액세스 키
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}     # AWS 비밀 키
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}   # Kakao 클라이언트 ID
         run: ./gradlew clean bootjar
 
       # 4. Docker Hub 로그인
