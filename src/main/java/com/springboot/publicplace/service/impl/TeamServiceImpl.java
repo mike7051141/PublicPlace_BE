@@ -181,7 +181,7 @@ public class TeamServiceImpl implements TeamService {
         // 모든 팀을 가져옴
         List<Team> teams = teamRepository.findAll();
 
-        return teams.stream()
+        List<GPTTeamListDto> teamLists = teams.stream()
                 .map(team -> {
                     // 팀원 수 계산
                     Long teamMemberCount = (long) team.getTeamUsers().size();
@@ -189,18 +189,19 @@ public class TeamServiceImpl implements TeamService {
                     double averageAge = team.getAverageAge();
                     // GPTTeamListDto 생성 및 반환
                     return GPTTeamListDto.builder()
-                            .teamName(team.getTeamName())            // 팀 이름
-                            .teamInfo(team.getTeamInfo())            // 팀 정보
-                            .createdAt(team.getCreatedAt())          // 생성일
-                            .teamLocation(team.getTeamLocation())    // 팀 위치
-                            .activityDays(team.getActivityDays())    // 활동일
-                            .teamMemberCount(teamMemberCount)         // 팀원 수
-                            .averageAge(averageAge)                         // 평균 나이 필드는 null로 설정 (추후 필요시 계산 추가)
+                            .teamName(team.getTeamName())
+                            .teamInfo(team.getTeamInfo())
+                            .createdAt(team.getCreatedAt())
+                            .teamLocation(team.getTeamLocation())
+                            .activityDays(team.getActivityDays())
+                            .teamMemberCount(teamMemberCount)
+                            .averageAge(averageAge)
                             .build();
                 })
                 .collect(Collectors.toList());
-    }
 
+        return teamLists;
+    }
 
     public List<TeamListResponseDto> getTeamsByCriteria(String sortBy, String teamName) {
         List<Team> teams;
