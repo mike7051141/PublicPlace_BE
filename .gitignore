@@ -6,7 +6,6 @@ build/
 !**/src/test/**/build/
 
 ### SECRET KEY INFO
-application.properties
 application-SECRET-KEY.properties
 
 ### STS ###
