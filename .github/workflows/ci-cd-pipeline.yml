@@ -63,4 +63,12 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/publicplace_be:latest
             docker stop publicplace_be || true
             docker rm publicplace_be || true
-            docker run -d --name publicplace_be -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/publicplace_be:latest
+            docker run -d --name publicplace_be -p 8080:8080 \
+              -e SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
+              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+              -e AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
+              -e AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} \
+              -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
+              ${{ secrets.DOCKERHUB_USERNAME }}/publicplace_be:latest
