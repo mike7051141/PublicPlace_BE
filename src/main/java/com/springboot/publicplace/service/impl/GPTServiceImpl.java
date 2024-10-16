@@ -46,7 +46,7 @@ public class GPTServiceImpl implements GPTService {
     public List<Message> getChatResponses(HttpServletRequest servletRequest, String prompt, HttpSession session) {
 
         // 팀 목록을 가져오는 요청
-        List<GPTTeamListDto> teamList = teamService.getTeamList(servletRequest);
+        List<GPTTeamListDto> teamList = teamService.getGptTeamList(servletRequest);
 
         // 팀 정보를 JSON 문자열로 변환
         String teamJson;
