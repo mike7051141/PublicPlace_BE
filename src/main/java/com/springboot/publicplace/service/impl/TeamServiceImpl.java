@@ -292,6 +292,6 @@ public class TeamServiceImpl implements TeamService {
     public boolean isTeamLeader(Team team, User user) {
         TeamUser teamUser = teamUserRepository.findByTeamAndUser(team,user)
                 .orElseThrow(() -> new UnauthorizedActionException("팀에 가입된 사용자가 아닙니다."));
-        return teamUser != null && "회장".equals(teamUser.getRole());
+        return teamUser != null && (teamUser.getRole().equals(RoleType.회장));
     }
 }
