@@ -4,10 +4,7 @@ import com.springboot.publicplace.config.security.JwtTokenProvider;
 import com.springboot.publicplace.dto.MemberDto;
 import com.springboot.publicplace.dto.ResultDto;
 import com.springboot.publicplace.dto.request.TeamRequestDto;
-import com.springboot.publicplace.dto.response.GPTTeamListDto;
-import com.springboot.publicplace.dto.response.TeamListResponseDto;
-import com.springboot.publicplace.dto.response.TeamResponseDto;
-import com.springboot.publicplace.dto.response.TeamRoleResponseDto;
+import com.springboot.publicplace.dto.response.*;
 import com.springboot.publicplace.entity.RoleType;
 import com.springboot.publicplace.entity.Team;
 import com.springboot.publicplace.entity.TeamUser;
@@ -176,45 +173,31 @@ public class TeamServiceImpl implements TeamService {
         );
     }
 
-//    @Override
-//    public List<TeamResponseDto> getRandomTeamList(HttpServletRequest servletRequest) {
-//        List<Team> teams = teamRepository.findAll();
-//        return teams.stream()
-//                .map(team -> {
-//                    // 팀원 리스트 생성
-//                    List<MemberDto> members = team.getTeamUsers().stream()
-//                            .map(teamUser -> new MemberDto(
-//                                    teamUser.getUser().getName(),
-//                                    teamUser.getUser().getNickname(),
-//                                    teamUser.getUser().getPosition(),
-//                                    teamUser.getRole(),
-//                                    teamUser.getUser().getAgeRange()
-//                            ))
-//                            .collect(Collectors.toList());
-//
-//                    // 팀원 수 계산
-//                    Long teamMemberCount = (long) members.size();
-//
-//                    // TeamResponseDto 생성 및 반환
-//                    return TeamResponseDto.builder()
-//                            .teamId(team.getTeamId())
-//                            .teamName(team.getTeamName())
-//                            .teamInfo(team.getTeamInfo())
-//                            .createdAt(team.getCreatedAt())
-//                            .teamLocation(team.getTeamLocation())
-//                            .latitude(team.getLatitude())
-//                            .longitude(team.getLongitude())
-//                            .teamImg(team.getTeamImg())
-//                            .activityDays(team.getActivityDays())
-//                            .teamMemberCount(teamMemberCount)  // 팀원 수 포함
-//                            .members(members)  // 팀원 리스트 포함
-//                            .build();
-//                })
-//                .collect(Collectors.toList());
-//    }
+    @Override
+    public List<TeamRandomListDto> getTeamList(HttpServletRequest servletRequest) {
+        List<Team> teams = teamRepository.findAll();
+        return teams.stream()
+                .map(team -> {
+                    Long teamMemberCount = (long) team.getTeamUsers().size();
+
+                    double averageAge = team.getAverageAge();
+
+                    // TeamResponseDto 생성 및 반환
+                    return TeamRandomListDto.builder()
+                            .teamId(team.getTeamId())
+                            .teamName(team.getTeamName())
+                            .createdAt(team.getCreatedAt())
+                            .teamLocation(team.getTeamLocation())
+                            .teamImg(team.getTeamImg())
+                            .teamMemberCount(teamMemberCount)  // 팀원 수 포함
+                            .averageAge(averageAge)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
 
     @Override
-    public List<GPTTeamListDto> getTeamList(HttpServletRequest servletRequest) {
+    public List<GPTTeamListDto> getGptTeamList(HttpServletRequest servletRequest) {
         // 모든 팀을 가져옴
         List<Team> teams = teamRepository.findAll();
 
