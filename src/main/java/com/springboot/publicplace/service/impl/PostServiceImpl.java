@@ -239,7 +239,7 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new ResourceNotFoundException("해당 댓글을 찾을 수 없습니다."));
 
         // 댓글 작성자 & 게시글 작성자만 댓글 삭제 가능
-        if (!comment.getUser().equals(user) || comment.getPost().getUser().equals(user)) {
+        if (!comment.getUser().equals(user) && !comment.getPost().getUser().equals(user)) {
             throw new UnauthorizedActionException("댓글을 삭제할 권한이 없습니다.");
         }
 
