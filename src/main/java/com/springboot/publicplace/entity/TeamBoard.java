@@ -33,9 +33,9 @@ public class TeamBoard extends BaseEntity {
 
     private String matchLocation;
 
-    private Long longitude;
+    private Double longitude;
 
-    private Long latitude;
+    private Double latitude;
 
     @OneToMany(mappedBy = "teamBoard", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamBoardComment> comments;
