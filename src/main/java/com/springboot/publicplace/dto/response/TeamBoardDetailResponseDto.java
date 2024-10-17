@@ -15,6 +15,7 @@ public class TeamBoardDetailResponseDto {
     private String content;
     private String Image;
     private String userName;
+    private String profileImg;
     private String matchLocation;
     private Long longitude;
     private Long latitude;
