@@ -17,7 +17,7 @@ public class TeamBoardListResponseDto {
     private String userName;
     private String userProfileImage;
     private String matchLocation;
-    private Long latitude;
-    private Long longitude;
+    private Double latitude;
+    private Double longitude;
     private LocalDateTime createdDate;
 }
