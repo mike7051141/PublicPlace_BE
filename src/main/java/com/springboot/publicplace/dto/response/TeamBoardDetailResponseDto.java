@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TeamBoardDetailResponseDto {
+    private Long userId;
     private Long teamBoardId;
     private String content;
     private String Image;

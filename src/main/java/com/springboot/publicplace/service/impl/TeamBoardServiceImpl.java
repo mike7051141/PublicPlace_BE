@@ -128,6 +128,7 @@ public class TeamBoardServiceImpl implements TeamBoardService {
 
         // 상세 정보 DTO로 반환
         TeamBoardDetailResponseDto detailDto = new TeamBoardDetailResponseDto(
+                teamBoard.getUser().getUserId(),
                 teamBoard.getTeamBoardId(),
                 teamBoard.getContent(),
                 teamBoard.getImage(),
