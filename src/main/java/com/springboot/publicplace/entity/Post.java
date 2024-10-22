@@ -23,6 +23,8 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
     private String title;
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String content;
     private int liked;
     private int viewCount;
