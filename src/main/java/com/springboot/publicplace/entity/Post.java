@@ -24,7 +24,7 @@ public class Post extends BaseEntity {
     private User user;
     private String title;
     @Lob
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
     private int liked;
     private int viewCount;

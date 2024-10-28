@@ -25,5 +25,7 @@ public class TeamBoardComment extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
 }

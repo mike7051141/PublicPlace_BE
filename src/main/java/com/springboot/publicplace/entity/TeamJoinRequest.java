@@ -36,5 +36,7 @@ public class TeamJoinRequest extends BaseEntity{
     private String userGender;
     private String userAgeRange;
     private String userPhoneNumber;
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String joinReason;
 }
