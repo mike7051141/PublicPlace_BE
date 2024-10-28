@@ -27,6 +27,8 @@ public class TeamBoard extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
 
     private String Image;

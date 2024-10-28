@@ -23,6 +23,8 @@ public class Team extends BaseEntity{
     @Column(unique = true)
     private String teamName;
 
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String teamInfo;
 
     private String teamLocation;
