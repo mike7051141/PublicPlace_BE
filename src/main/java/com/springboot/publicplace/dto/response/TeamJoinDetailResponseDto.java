@@ -17,6 +17,8 @@ public class TeamJoinDetailResponseDto {
     private String userGender;
     private String userAgeRange;
     private String userPhoneNumber;
+    private String foot;
+    private String position;
     private String joinReason;
     private Status status;
     private RoleType role;

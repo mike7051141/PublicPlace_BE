@@ -54,10 +54,13 @@ public class TeamJoinServiceImpl implements TeamJoinService {
         joinRequest.setUser(user);
         joinRequest.setRole(RoleType.팀원);
         joinRequest.setStatus(Status.PENDING);
-        joinRequest.setUserName(user.getName());
-        joinRequest.setUserGender(user.getGender());
-        joinRequest.setUserAgeRange(user.getAgeRange());
-        joinRequest.setUserPhoneNumber(user.getPhoneNumber());
+//        joinRequest.setUserName(user.getName());
+//        joinRequest.setUserGender(user.getGender());
+//        joinRequest.setUserAgeRange(user.getAgeRange());
+//        joinRequest.setUserPhoneNumber(user.getPhoneNumber());
+//        joinRequest.setUserProfileImg(user.getProfileImg());
+//        joinRequest.setFoot(user.getFoot());
+//        joinRequest.setPosition(user.getPosition());
         joinRequest.setJoinReason(joinReason);
 
         teamJoinRequestRepository.save(joinRequest);

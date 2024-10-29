@@ -50,7 +50,8 @@ public class TeamJoinAdminServiceImpl implements TeamJoinAdminService {
                 .map(request -> new TeamJoinResponseDto(
                         request.getRequestId(),
                         request.getUser().getName(),
-                        request.getUser().getPhoneNumber()
+                        request.getUser().getPhoneNumber(),
+                        request.getUser().getProfileImg()
                 ))
                 .collect(Collectors.toList());
     }
@@ -72,10 +73,12 @@ public class TeamJoinAdminServiceImpl implements TeamJoinAdminService {
         // 상세 정보 DTO로 반환
         TeamJoinDetailResponseDto detailDto = new TeamJoinDetailResponseDto(
                 request.getRequestId(),
-                request.getUserName(),
-                request.getUserGender(),
-                request.getUserAgeRange(),
-                request.getUserPhoneNumber(),
+                request.getUser().getName(),
+                request.getUser().getGender(),
+                request.getUser().getAgeRange(),
+                request.getUser().getPhoneNumber(),
+                request.getUser().getFoot(),
+                request.getUser().getPosition(),
                 request.getJoinReason(),
                 request.getStatus(),
                 request.getRole()

@@ -11,4 +11,5 @@ public class TeamJoinResponseDto {
     private Long requestId;
     private String name;
     private String phoneNumber;
+    private String profileImg;
 }
