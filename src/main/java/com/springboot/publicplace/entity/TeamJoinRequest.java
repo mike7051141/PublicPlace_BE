@@ -32,10 +32,13 @@ public class TeamJoinRequest extends BaseEntity{
     @Enumerated(EnumType.STRING)  // Status가 문자열로 저장됨
     private Status status;
 
-    private String userName;
-    private String userGender;
-    private String userAgeRange;
-    private String userPhoneNumber;
+//    private String userName;
+//    private String userGender;
+//    private String userAgeRange;
+//    private String userPhoneNumber;
+//    private String foot;
+//    private String position;
+//    private String userProfileImg;
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     private String joinReason;
