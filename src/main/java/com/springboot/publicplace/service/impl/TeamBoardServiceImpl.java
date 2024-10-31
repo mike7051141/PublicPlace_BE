@@ -115,7 +115,7 @@ public class TeamBoardServiceImpl implements TeamBoardService {
         }
         // 팀 게시글 댓글 조회
         List<TeamBoardCommentResponseDto> teamBoardCommentResponseDtos = teamBoardCommentRepository
-                .findByTeamBoard_TeamBoardIdOrderByCreatedAt(teamBoardId)
+                .findCommentsByTeamBoardIdOrderByCreatedAt(teamBoardId)
                 .stream()
                 .map(comment -> new TeamBoardCommentResponseDto(
                         comment.getCommentId(),
@@ -145,15 +145,9 @@ public class TeamBoardServiceImpl implements TeamBoardService {
 
     @Override
     public List<TeamBoardListResponseDto> getTeamBoardList(HttpServletRequest servletRequest, Long teamId, String content, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page,size);
 
-        Page<TeamBoard> teamBoards;
-
-        if (content == null || content.isEmpty()) {
-            teamBoards = teamBoardRepository.findByTeam_TeamId(teamId, pageable);
-        } else {
-            teamBoards = teamBoardRepository.findByTeam_TeamIdAndContentContaining(teamId, content, pageable);
-        }
+        Page<TeamBoard> teamBoards = teamBoardRepository.findTeamBoardsByTeamIdAndContent(teamId, content, pageable);
         List<TeamBoardListResponseDto> teamBoardList = teamBoards.stream().map(teamBoard -> new TeamBoardListResponseDto(
                 teamBoard.getTeamBoardId(),
                 teamBoard.getContent(),
