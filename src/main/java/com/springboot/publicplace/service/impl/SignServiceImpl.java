@@ -99,9 +99,15 @@ public class SignServiceImpl implements SignService {
         logger.info("[getSignInResult] 패스워드 일치");
 
         logger.info("[getSignInResult] SignInResultDto 객체 생성");
+
+        // Access Token과 Refresh Token 생성
+        String accessToken = jwtTokenProvider.createAccessToken(String.valueOf(user.getEmail()), user.getRoles());
+        String refreshToken = jwtTokenProvider.refreshIfExpired(String.valueOf(user.getEmail()),user.getRefreshToken());
+        userRepository.save(user);
+
         SignInResultDto signInResultDto = SignInResultDto.builder()
-                .token(jwtTokenProvider.createToken(String.valueOf(user.getEmail()),
-                        user.getRoles()))
+                .token(accessToken)
+                .refreshToken(refreshToken)
                 .success(true)
                 .code(HttpStatus.OK.value())
                 .msg("로그인에 성공하였습니다.")

@@ -49,6 +49,8 @@ public class User extends BaseEntity implements UserDetails{
 
     private String position;
 
+    private String refreshToken;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();

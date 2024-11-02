@@ -12,4 +12,5 @@ public class SignInResultDto{
     private int code;
     private String msg;
     private String token;
+    private String refreshToken;
 }

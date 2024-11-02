@@ -60,6 +60,7 @@ jobs:
               -e SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
               -e SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
               -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e REFRESH_SECRET=${{ secrets.REFRESH_SECRET }} \
               -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
               -e AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
               -e AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} \

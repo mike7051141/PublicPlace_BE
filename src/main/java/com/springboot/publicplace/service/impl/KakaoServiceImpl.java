@@ -66,14 +66,18 @@ public class KakaoServiceImpl implements KakaoService {
             log.info("[kakao login] authorizecode issued successfully");
             Map<String, Object> responseMap = objectMapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
             String accessToken = (String) responseMap.get("access_token");
+
             KakaoResponseDto kakaoUserInfo = getInfo(accessToken);
             if (kakaoUserInfo == null) {
                 return ResponseEntity.status(401).body("Invalid Kakao login");
             }
             // 사용자 정보가 있다면 이메일을 기준으로 DB에서 사용자 찾기
             User user = userRepository.findByEmail(kakaoUserInfo.getEmail());
+
+            String refreshToken;
             if (user == null) {
                 // 새로운 사용자는 DB에 저장
+                refreshToken = jwtTokenProvider.createRefreshToken(kakaoUserInfo.getEmail());
                 user = User.builder()
                         .email(kakaoUserInfo.getEmail())
                         .name(kakaoUserInfo.getName())
@@ -85,19 +89,21 @@ public class KakaoServiceImpl implements KakaoService {
                         .loginApproach("Kakao-Login")
                         .password("1") // 카카오 로그인에서는 비밀번호가 필요하지 않음
                         .roles(Collections.singletonList("ROLE_ADMIN")) // 기본 역할 설정
+                        .refreshToken(refreshToken)
                         .build();
                 userRepository.save(user);
-                return ResponseEntity.ok(accessToken);
-            } else { // JWT 토큰 생성
-                String token = jwtTokenProvider.createToken(user.getEmail(), user.getRoles());
-                return ResponseEntity.ok(new JwtResponse(true, 0, "Success", token));
+            } else {
+                refreshToken = jwtTokenProvider.refreshIfExpired(user.getEmail(), user.getRefreshToken());
             }
+            // 새로운 엑세스 토큰 발급
+            String token = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRoles());
+            return ResponseEntity.ok(new JwtResponse(true, 0, "Success", token, refreshToken));
         }catch (Exception e){
             e.printStackTrace();
             return null;
         }
-
     }
+
     private KakaoResponseDto getInfo(String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
