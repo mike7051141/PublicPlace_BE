@@ -40,6 +40,8 @@ public class SecurityConfiguration {
 
                 .and()
                 .authorizeRequests() // 리퀘스트에 대한 사용권한 체크
+                // React 빌드 파일과 정적 리소스에 대한 접근 허용
+                .antMatchers("/", "/index.html", "/static/**", "/js/**", "/css/**", "/images/**").permitAll()
                 .antMatchers(HttpMethod.OPTIONS,"/**").permitAll() // 프리플라이트 요청를 허용
                 .antMatchers("/sign-api/sign-in", "/sign-api/sign-up",("/kakao/callback"),
                         "/sign-api/exception", "/api/files/**","/api/v1/chat/**","/auth/refresh").permitAll() // 가입 및 로그인 주소는 허용
