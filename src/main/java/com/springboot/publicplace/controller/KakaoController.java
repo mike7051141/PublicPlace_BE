@@ -2,6 +2,7 @@ package com.springboot.publicplace.controller;
 
 import com.springboot.publicplace.service.KakaoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,12 +25,21 @@ public class KakaoController {
     @Value("${KAKAO_CLIENT_ID}")
     private String client_id;
 
-    @Value("${kakao.redirect.url}")
-    private String redirect_url;
+//    @Value("${kakao.redirect.url}")
+//    private String redirect_url;
+
+    @Autowired
+    private HttpServletRequest request;
 
     @GetMapping("/page")
     public ResponseEntity<String> loginPage() {
-        String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+client_id+"&redirect_uri="+redirect_url;
+        // 요청의 호스트 정보를 읽어 동적으로 redirect_url 구성
+        String host = request.getRequestURL().toString().replace(request.getRequestURI(), "");
+        String redirectUrl = host + "/api/v1/kakao/callback";
+
+        // 카카오 인증 URL 생성
+        String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + client_id + "&redirect_uri=" + redirectUrl;
+
         return ResponseEntity.status(HttpStatus.OK).body(location);
     }
 
