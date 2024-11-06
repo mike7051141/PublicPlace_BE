@@ -10,7 +10,6 @@ import com.springboot.publicplace.repository.UserRepository;
 import com.springboot.publicplace.service.KakaoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +20,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Map;
 
@@ -31,8 +29,8 @@ import java.util.Map;
 public class KakaoServiceImpl implements KakaoService {
     @Value("${KAKAO_CLIENT_ID}")
     private String clientKey;
-//    @Value("${kakao.redirect.url}")
-//    private String redirectUrl;
+    @Value("${kakao.redirect.url}")
+    private String redirectUrl;
     @Value("${kakao.accesstoken.url}")
     private String kakaoAccessTokenUrl;
     @Value("${kakao.userinfo.url}")
@@ -40,9 +38,6 @@ public class KakaoServiceImpl implements KakaoService {
 
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private HttpServletRequest request;
 
     @Override
     public ResponseEntity<?> getKaKaoUserInfo(String authorizeCode) {
@@ -53,12 +48,7 @@ public class KakaoServiceImpl implements KakaoService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
-        // 요청의 호스트 정보를 읽어 동적으로 redirect_uri 구성
-        String host = request.getRequestURL().toString().replace(request.getRequestURI(), "");
-        String redirectUrl = host + "/api/v1/kakao/callback";
-        log.info("host: {}", host);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-
         params.add("grant_type", "authorization_code");
         params.add("client_id", clientKey);
         params.add("redirect_uri", redirectUrl);
