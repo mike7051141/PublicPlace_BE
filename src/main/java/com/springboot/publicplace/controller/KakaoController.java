@@ -35,7 +35,7 @@ public class KakaoController {
     public ResponseEntity<String> loginPage() {
         // 요청의 호스트 정보를 읽어 동적으로 redirect_url 구성
         String host = request.getRequestURL().toString().replace(request.getRequestURI(), "");
-        String redirectUrl = host + "/api/v1/kakao/callback";
+        String redirectUrl = host.replace(":8080", ":3000") + "/api/v1/kakao/callback";
 
         // 카카오 인증 URL 생성
         String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + client_id + "&redirect_uri=" + redirectUrl;
@@ -55,7 +55,7 @@ public class KakaoController {
     public ResponseEntity<?> kakaoLogin(@RequestParam String code, HttpServletRequest servletRequest) {
         // 요청의 호스트 정보를 읽어 동적으로 redirect_url 구성
         String host = servletRequest.getRequestURL().toString().replace(servletRequest.getRequestURI(), "");
-        String redirectUrl = host + "/api/v1/kakao/callback";
+        String redirectUrl = host.replace(":8080", ":3000") + "/api/v1/kakao/callback";
 
         // 카카오 서비스에 code와 redirectUrl을 전달
         ResponseEntity<?> signInResultDto = kakaoService.getKaKaoUserInfo(code, redirectUrl);
