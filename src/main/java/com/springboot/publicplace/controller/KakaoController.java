@@ -33,6 +33,7 @@ public class KakaoController {
         return ResponseEntity.status(HttpStatus.OK).body(location);
     }
 
+
     @ApiIgnore
     @GetMapping("/callback")
     @ResponseBody
@@ -43,7 +44,12 @@ public class KakaoController {
     @GetMapping("/login")
     @ResponseBody
     public ResponseEntity<?> kakaoLogin(@RequestParam String code, HttpServletRequest servletRequest) {
-        ResponseEntity<?> signInResultDto = kakaoService.getKaKaoUserInfo(code);
+        // 요청의 호스트 정보를 읽어 동적으로 redirect_url 구성
+        String host = servletRequest.getRequestURL().toString().replace(servletRequest.getRequestURI(), "");
+        String redirectUrl = host + "/api/v1/kakao/callback";
+
+        // 카카오 서비스에 code와 redirectUrl을 전달
+        ResponseEntity<?> signInResultDto = kakaoService.getKaKaoUserInfo(code, redirectUrl);
         return ResponseEntity.status(HttpStatus.OK).body(signInResultDto);
     }
 }
