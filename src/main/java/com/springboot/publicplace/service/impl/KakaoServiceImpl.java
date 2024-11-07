@@ -45,7 +45,7 @@ public class KakaoServiceImpl implements KakaoService {
     private HttpServletRequest request;
 
     @Override
-    public ResponseEntity<?> getKaKaoUserInfo(String authorizeCode) {
+    public ResponseEntity<?> getKaKaoUserInfo(String authorizeCode, String redirectUrl) {
         log.info("[kakao login] issue a authorizecode");
         ObjectMapper objectMapper = new ObjectMapper(); // json 파싱해주는 객체
         RestTemplate restTemplate = new RestTemplate(); // client 연결 객체
