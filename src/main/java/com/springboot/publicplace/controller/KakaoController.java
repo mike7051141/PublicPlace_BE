@@ -46,7 +46,7 @@ public class KakaoController {
         log.info("Server Name: {}", serverName);
         // 서버 이름에 따라 리다이렉트 URL 설정
         if (serverName.equals("3.36.221.111")) {
-            redirectUrl = "http://publicplace.site/api/v1/kakao/callback";
+            redirectUrl = "http://publicplace.site:3000/api/v1/kakao/callback";
         } else {
             // 기본 리다이렉트 URL 설정
             redirectUrl = "http://localhost:3000/api/v1/kakao/callback";
@@ -73,7 +73,7 @@ public class KakaoController {
 
         // 서버 이름에 따라 리다이렉트 URL 설정
         if (serverName.equals("3.36.221.111")) {
-            redirectUrl = "http://publicplace.site/api/v1/kakao/callback";
+            redirectUrl = "http://publicplace.site:3000/api/v1/kakao/callback";
         } else {
             // 기본 리다이렉트 URL 설정
             redirectUrl = "http://localhost:3000/api/v1/kakao/callback";
