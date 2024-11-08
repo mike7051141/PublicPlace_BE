@@ -41,17 +41,20 @@ public class KakaoController {
 //        String host = request.getRequestURL().toString().replace(request.getRequestURI(), "");
 //        String redirectUrl = host.replace(":8080", ":3000") + "/api/v1/kakao/callback";
 
-        String serverName = request.getServerName();
+        // 요청의 Host 헤더에서 실제 도메인 정보를 가져오기
+        String host = request.getHeader("Host");
         String redirectUrl;
-        log.info("Server Name: {}", serverName);
-        // 서버 이름에 따라 리다이렉트 URL 설정
-        if (serverName.equals("publicplace.site")) {
+
+        log.info("Host Header: {}", host);  // 실제로 요청된 도메인 로그 출력
+
+        // Host 헤더에 따라 리다이렉트 URL 설정
+        if (host.equals("publicplace.site") || host.equals("publicplace.site:3000")) {
             redirectUrl = "http://publicplace.site/api/v1/kakao/callback";
-        } else if (serverName.equals("3.36.221.111")) {
+        } else if (host.equals("3.36.221.111") || host.equals("3.36.221.111:3000")) {
             redirectUrl = "http://3.36.221.111/api/v1/kakao/callback";
         } else {
             // 기본 리다이렉트 URL 설정
-            redirectUrl = "http://publicplace.site/api/v1/kakao/callback";
+            redirectUrl = "http://localhost:3000/api/v1/kakao/callback";
         }
 
         // 카카오 인증 URL 생성
@@ -71,8 +74,22 @@ public class KakaoController {
     @ResponseBody
     public ResponseEntity<?> kakaoLogin(@RequestParam String code, HttpServletRequest servletRequest) {
         // 요청의 호스트 정보를 읽어 동적으로 redirect_url 구성
-        String host = servletRequest.getRequestURL().toString().replace(servletRequest.getRequestURI(), "");
-        String redirectUrl = host.replace(":8080", ":3000") + "/api/v1/kakao/callback";
+//        String host = servletRequest.getRequestURL().toString().replace(servletRequest.getRequestURI(), "");
+//        String redirectUrl = host.replace(":8080", ":3000") + "/api/v1/kakao/callback";
+
+        // 요청의 Host 헤더에서 실제 도메인 정보를 가져오기
+        String host = request.getHeader("Host");
+        String redirectUrl;
+
+        // Host 헤더에 따라 리다이렉트 URL 설정
+        if (host.equals("publicplace.site") || host.equals("publicplace.site:3000")) {
+            redirectUrl = "http://publicplace.site/api/v1/kakao/callback";
+        } else if (host.equals("3.36.221.111") || host.equals("3.36.221.111:3000")) {
+            redirectUrl = "http://3.36.221.111/api/v1/kakao/callback";
+        } else {
+            // 기본 리다이렉트 URL 설정
+            redirectUrl = "http://localhost:3000/api/v1/kakao/callback";
+        }
 
         // 카카오 서비스에 code와 redirectUrl을 전달
         ResponseEntity<?> signInResultDto = kakaoService.getKaKaoUserInfo(code, redirectUrl);
