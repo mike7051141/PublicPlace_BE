@@ -52,8 +52,6 @@ public class JwtTokenProvider {
 
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
         refreshKey = Base64.getEncoder().encodeToString(refreshKey.getBytes());
-        System.out.println("초기화 후 : "+secretKey);
-        logger.info("[init] 시크릿 초기화 완료 : {}",secretKey);
     }
 
     // AccessToken 생성 메서드
