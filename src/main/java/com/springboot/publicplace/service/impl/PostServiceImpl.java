@@ -256,7 +256,7 @@ public class PostServiceImpl implements PostService {
     public ResultDto toggleLike(Long postId, HttpServletRequest servletRequest) {
         String token = jwtTokenProvider.resolveToken(servletRequest);
         String email = jwtTokenProvider.getUsername(token);
-        User user = userRepository.findByEmail(email);;
+        User user = userRepository.findByEmail(email);
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("해당 게시글을 찾을 수 없습니다."));
@@ -266,22 +266,21 @@ public class PostServiceImpl implements PostService {
         if (existingLike != null) {
             likePostRepository.delete(existingLike);
             post.setLiked(post.getLiked() - 1);
-            return ResultDto.builder()
-                    .success(true)
-                    .msg("좋아요가 취소되었습니다.")
-                    .code(HttpStatus.OK.value())
-                    .build();
         } else {
             LikePost likePost = new LikePost();
             likePost.setUser(user);
             likePost.setPost(post);
             likePostRepository.save(likePost);
             post.setLiked(post.getLiked() + 1);
-            return ResultDto.builder()
-                    .success(true)
-                    .msg("좋아요가 추가되었습니다.")
-                    .code(HttpStatus.OK.value())
-                    .build();
         }
+
+        // 여기서 포스트 엔티티를 다시 저장하여 변경사항을 반영합니다.
+        postRepository.save(post);
+
+        return ResultDto.builder()
+                .success(true)
+                .msg(existingLike != null ? "좋아요가 취소되었습니다." : "좋아요가 추가되었습니다.")
+                .code(HttpStatus.OK.value())
+                .build();
     }
 }
