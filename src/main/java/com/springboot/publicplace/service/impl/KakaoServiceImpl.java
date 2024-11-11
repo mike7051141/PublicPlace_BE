@@ -159,12 +159,6 @@ public class KakaoServiceImpl implements KakaoService {
                         .roles(Collections.singletonList("ROLE_ADMIN")) // 기본 역할 설정
                         .build();
                 userRepository.save(user);
-            } else {
-                // 기존 사용자의 정보 업데이트 (필요시)
-                user.setName(requestSignUpDto.getName());
-                user.setEmail(requestSignUpDto.getEmail());
-                user.setAgeRange(requestSignUpDto.getAgeRange());
-                userRepository.save(user);
             }
             return requestSignUpDto;
         } catch (Exception e) {
