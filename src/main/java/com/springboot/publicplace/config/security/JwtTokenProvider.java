@@ -40,7 +40,7 @@ public class JwtTokenProvider {
     private String refreshKey = "refreshKey";
 
     // AccessToken 유효 기간 (1시간)
-    private final Long accessTokenValidTime = 1000L * 60 * 60;
+    private final Long accessTokenValidTime = 1000L * 60 * 60 * 24;
 
     // RefreshToken 유효 기간(2주)
     private final Long refreshTokenValidTime = 1000L * 60 * 60 * 24 * 14;
