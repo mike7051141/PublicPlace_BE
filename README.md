@@ -73,10 +73,23 @@
 
 <table align="center">
   <tr>
-    <td align="center"><img src="https://github.com/user-attachments/assets/49cb8b59-ff13-4fb7-9bd3-0ebde34dfacc" alt="김민기" width="100"><br><b>김민기</b><br>Back-End Developer</td>
-    <td align="center"><img src="https://via.placeholder.com/100" alt="김영훈" width="100"><br><b>김영훈</b><br>Front-End Developer</td>
+    <td align="center">
+      <a href="https://github.com/mike7051141">
+        <img src="https://github.com/user-attachments/assets/49cb8b59-ff13-4fb7-9bd3-0ebde34dfacc" alt="김민기" width="100"><br>
+        <b>김민기</b>
+      </a>
+      <br>Back-End Developer
+    </td>
+    <td align="center">
+      <a href="https://github.com/eth220421">
+        <img src="https://via.placeholder.com/100" alt="김영훈" width="100"><br>
+        <b>김영훈</b>
+      </a>
+      <br>Front-End Developer
+    </td>
   </tr>
 </table>
+
 
 
 ## 🚀 주요 기능
