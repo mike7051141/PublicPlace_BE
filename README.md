@@ -69,10 +69,28 @@
 - **Deployment**: Docker Compose, GitHub Actions  
 
 # 👥 팀원 구성
-| **김민기** | **김영훈** |
-| :------: |  :------: |
-| [<img src="https://avatars.githubusercontent.com/u/111833871?v=4" alt="김민기" width="70" height="70"><br />@mike7051141](https://github.com/mike7051141) | [<img src="https://avatars.githubusercontent.com/u/145416076?v=4" height=70 width=70> <br/> @eth220421](https://github.com/eth220421) |
-| Back-End Developer | Front-End Developer |
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/mike7051141">
+          <img src="https://avatars.githubusercontent.com/u/111833871?v=4" alt="김민기" width="100" height="100"><br />
+          <b>@mike7051141</b>
+        </a><br />
+        Back-End Developer
+      </td>
+      <td align="center">
+        <a href="https://github.com/eth220421">
+          <img src="https://avatars.githubusercontent.com/u/145416076?v=4" alt="김영훈" width="100" height="100"><br />
+          <b>@eth220421</b>
+        </a><br />
+        Front-End Developer
+      </td>
+    </tr>
+  </table>
+</div>
+
 
 # 💡 주요 기능
 
